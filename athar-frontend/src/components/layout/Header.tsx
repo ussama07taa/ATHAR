@@ -275,7 +275,7 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
           style={{
             fontSize: '0.8rem',
             fontWeight: 700,
-            color: pathname === '/niche' ? '#CA8A04' : '#A16207',
+            color: pathname === '/niche' ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
             textDecoration: 'none',
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
@@ -317,7 +317,7 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
           style={{
             fontSize: '0.8rem',
             fontWeight: 700,
-            color: pathname === '/parfums-arabic' ? '#CA8A04' : '#A16207',
+            color: pathname === '/parfums-arabic' ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
             textDecoration: 'none',
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
@@ -343,7 +343,7 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
             style={{
               fontSize: '0.8rem',
               fontWeight: 700,
-              color: pathname.startsWith('/decantage-des-parfums') ? '#CA8A04' : '#A16207',
+              color: pathname.startsWith('/decantage-des-parfums') ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
               textDecoration: 'none',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',

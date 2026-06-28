@@ -131,7 +131,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                 style={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  color: pathname === '/niche' ? '#CA8A04' : '#A16207',
+                  color: linkColor(pathname === '/niche'),
                   textDecoration: 'none',
                   letterSpacing: '0.05em',
                   transition: 'color 200ms ease'
@@ -163,7 +163,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                 style={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  color: pathname === '/parfums-arabic' ? '#CA8A04' : '#A16207',
+                  color: linkColor(pathname === '/parfums-arabic'),
                   textDecoration: 'none',
                   letterSpacing: '0.05em',
                   transition: 'color 200ms ease'
