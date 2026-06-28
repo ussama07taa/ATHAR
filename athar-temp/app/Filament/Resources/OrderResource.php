@@ -94,7 +94,8 @@ class OrderResource extends Resource
                                     ->schema([
                                         Forms\Components\Select::make('product_variant_id')
                                             ->label('Produit/Taille')
-                                            ->relationship('variant', 'size')
+                                            ->relationship('variant', 'id')
+                                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->product ? $record->product->name : 'Inconnu') . ' - ' . $record->size)
                                             ->disabled()
                                             ->dehydrated()
                                             ->columnSpan(2),
