@@ -90,27 +90,14 @@ class ProductController extends Controller
 
         $productIds = $query->pluck('id');
 
-        // Get distinct brand IDs from the selected products
-        $brandIds = Product::whereIn('id', $productIds)
-            ->whereNotNull('brand_id')
-            ->pluck('brand_id')
+        // Get distinct brands from the selected products
+        $brandsFromProducts = Product::whereIn('id', $productIds)
+            ->whereNotNull('brand')
+            ->pluck('brand')
             ->unique()
             ->filter();
 
-        // Fetch brand names for those IDs
-        $brandsFromProducts = Brand::whereIn('id', $brandIds)
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->pluck('name');
-
-        // Include all active brands as fallback and merge
-        $allActiveBrands = Brand::where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->pluck('name');
-
-        $brands = $allActiveBrands->merge($brandsFromProducts)->unique()->values();
+        $brands = $brandsFromProducts->values();
 
         $sizes = ProductVariant::whereIn('product_id', $productIds)
             ->distinct()
