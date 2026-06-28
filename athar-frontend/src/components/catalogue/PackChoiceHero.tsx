@@ -5,7 +5,7 @@ interface PackChoiceHeroProps {
   fixedCount: number;
 }
 
-export default function PackChoiceHero({ customCount, fixedCount }: PackChoiceHeroProps) {
+export default function PackChoiceHero({ fixedCount }: PackChoiceHeroProps) {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -15,14 +15,10 @@ export default function PackChoiceHero({ customCount, fixedCount }: PackChoiceHe
       <style>{`
         .pack-choice-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
           gap: 20px;
-        }
-        @media (max-width: 600px) {
-          .pack-choice-grid {
-            grid-template-columns: 1fr;
-            gap: 14px;
-          }
+          max-width: 400px;
+          margin: 0 auto;
         }
         .pack-choice-card {
           border-radius: 24px;
@@ -38,10 +34,6 @@ export default function PackChoiceHero({ customCount, fixedCount }: PackChoiceHe
         .pack-choice-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        }
-        .pack-card-custom {
-          background: #111;
-          color: #fff;
         }
         .pack-card-fixed {
           background: #F9F8F6;
@@ -110,33 +102,13 @@ export default function PackChoiceHero({ customCount, fixedCount }: PackChoiceHe
             Packs Decante
           </h1>
           <p style={{ fontSize: '0.95rem', color: '#888', lineHeight: 1.6 }}>
-            Choisissez votre type de pack pour commencer.
+            Découvrez notre sélection de packs prêts-à-offrir.
           </p>
         </div>
 
-        {/* Two-choice Cards */}
-        <div className="pack-choice-grid" style={{ maxWidth: 760, margin: '0 auto' }}>
-
-          {/* Card 1 — Personnalisable */}
-          {customCount > 0 && (
-            <button
-              className="pack-choice-card pack-card-custom"
-              onClick={() => scrollTo('packs-personnalisables')}
-            >
-              <div className="pack-card-icon">🎨</div>
-              <span className="pack-card-badge">{customCount} pack{customCount > 1 ? 's' : ''} disponibles</span>
-              <h2 className="pack-card-title">Je compose mon pack</h2>
-              <p className="pack-card-desc">
-                Choisissez vos fragrances favorites et créez un pack 100% personnalisé selon vos envies.
-              </p>
-              <span className="pack-card-cta">
-                Voir les packs <span style={{ fontSize: '1rem' }}>→</span>
-              </span>
-            </button>
-          )}
-
-          {/* Card 2 — Prêts-à-offrir */}
-          {fixedCount > 0 && (
+        {/* Single Card — Prêts-à-offrir */}
+        {fixedCount > 0 && (
+          <div className="pack-choice-grid">
             <button
               className="pack-choice-card pack-card-fixed"
               onClick={() => scrollTo('packs-prets-a-offrir')}
@@ -151,9 +123,8 @@ export default function PackChoiceHero({ customCount, fixedCount }: PackChoiceHe
                 Voir les packs <span style={{ fontSize: '1rem' }}>→</span>
               </span>
             </button>
-          )}
-
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

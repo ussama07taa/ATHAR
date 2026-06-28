@@ -124,6 +124,54 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                 Accueil
               </Link>
 
+              {/* Niche */}
+              <Link
+                href="/niche"
+                onClick={onClose}
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: pathname === '/niche' ? '#CA8A04' : '#A16207',
+                  textDecoration: 'none',
+                  letterSpacing: '0.05em',
+                  transition: 'color 200ms ease'
+                }}
+              >
+                Niche
+              </Link>
+
+              {/* Packs */}
+              <Link
+                href="/packs"
+                onClick={onClose}
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: linkColor(pathname === '/packs'),
+                  textDecoration: 'none',
+                  letterSpacing: '0.05em',
+                  transition: 'color 200ms ease'
+                }}
+              >
+                Packs
+              </Link>
+
+              {/* Arabic */}
+              <Link
+                href="/parfums-arabic"
+                onClick={onClose}
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: pathname === '/parfums-arabic' ? '#CA8A04' : '#A16207',
+                  textDecoration: 'none',
+                  letterSpacing: '0.05em',
+                  transition: 'color 200ms ease'
+                }}
+              >
+                Arabic
+              </Link>
+
               {/* Parfums accordion */}
               {parfumsMenu && (
                 <div>

@@ -344,105 +344,30 @@ export default function CatalogueContent({
           {/* Grid or Grouped Pack Sections */}
           {isPack ? (
             <div>
-              {(() => {
-                const customPacks = filteredProducts.filter(p => p.is_custom_pack);
-                const fixedPacks = filteredProducts.filter(p => !p.is_custom_pack);
+              {filteredProducts.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                  <p style={{ color: '#999', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Aucun pack disponible dans cet univers pour le moment.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div style={{ marginBottom: 30, paddingBottom: 15, borderBottom: '2px solid #111', display: 'inline-block' }}>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      Packs Decante Prêts-à-offrir
+                    </h2>
+                    <p style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>
+                      Une sélection experte de nos fragrances les plus appréciées.
+                    </p>
+                  </div>
 
-                if (filteredProducts.length === 0) {
-                  return (
-                    <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                      <p style={{ color: '#999', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        Aucun pack disponible dans cet univers pour le moment.
-                      </p>
-                    </div>
-                  );
-                }
-
-                // Force view to 'custom' if 'fixed' is selected but empty (and vice versa)
-                const currentView = 
-                  (packViewType === 'custom' && customPacks.length === 0 && fixedPacks.length > 0) ? 'fixed' :
-                  (packViewType === 'fixed' && fixedPacks.length === 0 && customPacks.length > 0) ? 'custom' :
-                  packViewType;
-
-                const activePacks = currentView === 'custom' ? customPacks : fixedPacks;
-
-                return (
-                  <>
-                    {/* Clean Segmented Toggle UI */}
-                    {customPacks.length > 0 && fixedPacks.length > 0 && (
-                      <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        gap: 16,
-                        marginBottom: 40,
-                      }}>
-                        <button
-                          onClick={() => setPackViewType('custom')}
-                          style={{
-                            padding: '12px 24px',
-                            borderRadius: 999,
-                            background: currentView === 'custom' ? '#111' : '#F9F8F6',
-                            color: currentView === 'custom' ? '#fff' : '#111',
-                            border: currentView === 'custom' ? '1px solid #111' : '1px solid rgba(0,0,0,0.08)',
-                            fontSize: '0.75rem',
-                            fontWeight: 800,
-                            letterSpacing: '0.12em',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            transition: 'all 300ms ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8
-                          }}
-                        >
-                          Je compose mon coffret <span style={{ opacity: 0.6 }}>({customPacks.length})</span>
-                        </button>
-                        <button
-                          onClick={() => setPackViewType('fixed')}
-                          style={{
-                            padding: '12px 24px',
-                            borderRadius: 999,
-                            background: currentView === 'fixed' ? '#111' : '#F9F8F6',
-                            color: currentView === 'fixed' ? '#fff' : '#111',
-                            border: currentView === 'fixed' ? '1px solid #111' : '1px solid rgba(0,0,0,0.08)',
-                            fontSize: '0.75rem',
-                            fontWeight: 800,
-                            letterSpacing: '0.12em',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            transition: 'all 300ms ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8
-                          }}
-                        >
-                          Prêts-à-offrir <span style={{ opacity: 0.6 }}>({fixedPacks.length})</span>
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Description of current mode */}
-                    <div style={{ marginBottom: 30, paddingBottom: 15, borderBottom: currentView === 'custom' ? '2px solid #CA8A04' : '2px solid #111', display: 'inline-block' }}>
-                      <h2 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        {currentView === 'custom' ? 'Packs Decante Personnalisables' : 'Packs Decante Prêts-à-offrir'}
-                      </h2>
-                      <p style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>
-                        {currentView === 'custom' 
-                          ? 'Libérez votre créativité et composez votre pack sur mesure.'
-                          : 'Une sélection experte de nos fragrances les plus appréciées.'}
-                      </p>
-                    </div>
-
-                    {/* Shared Grid */}
-                    <div className={`cat-grid ${viewMode === 'grid4' ? 'grid-4' : 'grid-2'}`}>
-                      {activePacks.map((p, idx) => (
-                        <CatalogueProductCard key={p.id} product={p} priority={idx < 4} isNiche={isNiche} />
-                      ))}
-                    </div>
-                  </>
-                );
-              })()}
+                  <div className={`cat-grid ${viewMode === 'grid4' ? 'grid-4' : 'grid-2'}`}>
+                    {filteredProducts.map((p, idx) => (
+                      <CatalogueProductCard key={p.id} product={p} priority={idx < 4} isNiche={isNiche} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className={`cat-grid ${viewMode === 'grid4' ? 'grid-4' : 'grid-2'}`}>
