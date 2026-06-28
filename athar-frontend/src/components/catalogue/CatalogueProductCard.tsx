@@ -137,6 +137,7 @@ export default function CatalogueProductCard({ product, priority = false, isNich
         .prod-price {
           margin: 0;
           font-size: 0.8rem;
+          font-family: ui-sans-serif, system-ui, sans-serif;
           color: ${isNiche ? '#D4AF37' : '#6B6654'};
           font-weight: 700;
           letter-spacing: 0.05em;
