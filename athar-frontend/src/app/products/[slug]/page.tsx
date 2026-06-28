@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import ProductDetail from '@/components/product/ProductDetail';
 import RelatedProducts from '@/components/product/RelatedProducts';
-import { Product } from '@/app/page';
+import BoxBuilder from '@/components/product/BoxBuilder';
+import { Product } from '@/types/product';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000';
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://athar.ma';
@@ -12,7 +13,7 @@ async function getProduct(slug: string): Promise<Product | null> {
     const res = await fetch(`${API_URL}/api/products`, { cache: 'no-store' });
     if (!res.ok) return null;
     const all: Product[] = await res.json();
-    return all.find((p) => p.slug === slug) ?? null;
+    return all.find((p: Product) => p.slug === slug) ?? null;
   } catch {
     return null;
   }
@@ -71,6 +72,8 @@ export default async function ProductPage({ params }: Props) {
       style={{
         minHeight: '100dvh',
         transition: 'background-color 300ms ease',
+        background: product.is_niche ? '#FCFBFA' : '#fff',
+        color: '#1C1917'
       }}
     >
       <script
@@ -86,14 +89,22 @@ export default async function ProductPage({ params }: Props) {
           inset: 0,
           pointerEvents: 'none',
           zIndex: 0,
-          background:
-            'radial-gradient(ellipse 50% 60% at 30% 40%, rgba(200,162,92,0.07) 0%, transparent 70%)',
+          background: product.is_niche 
+            ? 'radial-gradient(ellipse 50% 60% at 30% 40%, rgba(202,138,4,0.1) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse 50% 60% at 30% 40%, rgba(200,162,92,0.07) 0%, transparent 70%)',
         }}
       />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <ProductDetail product={product} />
-        <RelatedProducts products={product.related_products || []} />
+        {product.is_pack ? (
+           <BoxBuilder product={product} />
+        ) : (
+           <ProductDetail product={product} />
+        )}
+        
+        {product.related_products && product.related_products.length > 0 && (
+          <RelatedProducts products={product.related_products} />
+        )}
       </div>
     </main>
   );

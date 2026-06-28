@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { MenuCategory } from '@/types/catalog';
+import { siteConfig } from '@/lib/site-config';
 
 interface NavLink {
   href: string;
@@ -22,11 +23,11 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const isLight = mounted && resolvedTheme === 'light';
   const [parfumsMenu, setParfumsMenu] = useState<MenuCategory | null>(null);
   const [parfumsExpanded, setParfumsExpanded] = useState(false);
 
   useEffect(() => setMounted(true), []);
-  const isLight = mounted && resolvedTheme === 'light';
 
   useEffect(() => {
     fetch('/api/collections?menu=true')
@@ -49,7 +50,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
   }, [isOpen]);
 
   const linkColor = (active: boolean) =>
-    active ? '#C8A25C' : (isLight ? '#111827' : '#F2EDE2');
+    active ? '#CA8A04' : (isLight ? '#111827' : '#F2EDE2');
 
   return (
     <AnimatePresence>
@@ -88,12 +89,13 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
               padding: '40px 32px',
               boxShadow: '20px 0 60px rgba(0,0,0,0.5)',
               overflowY: 'auto',
+              transition: 'all 300ms ease'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 60 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#C8A25C', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Athar</span>
-                <span style={{ fontSize: '0.5rem', fontWeight: 400, color: '#9B7A3D', letterSpacing: '0.3em', textTransform: 'uppercase' }}>Maison de Parfums</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#CA8A04', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Athar</span>
+                <span style={{ fontSize: '0.55rem', fontWeight: 500, color: '#A16207', letterSpacing: '0.4em', textTransform: 'uppercase', marginTop: 4 }}>Maison de Parfums</span>
               </div>
               <button
                 onClick={onClose}
@@ -114,6 +116,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                   color: linkColor(pathname === '/'),
                   textDecoration: 'none',
                   letterSpacing: '0.05em',
+                  transition: 'color 200ms ease'
                 }}
               >
                 Accueil
@@ -136,6 +139,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                       alignItems: 'center',
                       gap: 8,
                       padding: 0,
+                      transition: 'color 200ms ease'
                     }}
                   >
                     Parfums
@@ -165,16 +169,16 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                         <Link
                           href="/catalogue?category=parfums"
                           onClick={onClose}
-                          style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#C8A25C', textDecoration: 'none', marginBottom: 16 }}
+                          style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#CA8A04', textDecoration: 'none', marginBottom: 20 }}
                         >
                           Tous les parfums
                         </Link>
                         {parfumsMenu.children?.map((group) => (
-                          <div key={group.slug} style={{ marginBottom: 20 }}>
+                          <div key={group.slug} style={{ marginBottom: 24 }}>
                             <Link
                               href={`/catalogue?category=${group.slug}`}
                               onClick={onClose}
-                              style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700, color: isLight ? '#333' : '#F2EDE2', textDecoration: 'none', marginBottom: 8 }}
+                              style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2', textDecoration: 'none', marginBottom: 10 }}
                             >
                               {group.name}
                             </Link>
@@ -183,7 +187,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                                 key={sub.slug}
                                 href={`/catalogue?category=${sub.slug}`}
                                 onClick={onClose}
-                                style={{ display: 'block', fontSize: '0.85rem', color: isLight ? '#666' : '#9B9585', textDecoration: 'none', padding: '4px 0 4px 12px' }}
+                                style={{ display: 'block', fontSize: '0.85rem', color: isLight ? '#44403C' : '#A8A29E', textDecoration: 'none', padding: '6px 0 6px 12px' }}
                               >
                                 {sub.name}
                               </Link>
@@ -207,6 +211,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                     color: linkColor(pathname === href),
                     textDecoration: 'none',
                     letterSpacing: '0.05em',
+                    transition: 'color 200ms ease'
                   }}
                 >
                   {label}
@@ -215,16 +220,16 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
             </nav>
 
             <div style={{ marginTop: 'auto', paddingTop: 40, borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` }}>
-              <p style={{ fontSize: '0.7rem', color: '#9B7A3D', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 20 }}>Suivez-nous</p>
-              <div style={{ display: 'flex', gap: 20 }}>
-                <a href="https://instagram.com/athar" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              <p style={{ fontSize: '0.7rem', color: '#A16207', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 20, fontWeight: 700 }}>Suivez-nous</p>
+               <div style={{ display: 'flex', gap: 24 }}>
+                <a href="https://www.instagram.com/atha_rfragrances/" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.7 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </a>
-                <a href="https://tiktok.com/@athar" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
+                <a href="https://www.tiktok.com/@atha_rfragrances?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.7 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
                 </a>
-                <a href="https://wa.me/212600000000" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href={`https://wa.me/${siteConfig.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.7 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 </a>
               </div>
             </div>

@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
 import CatalogueContent from '@/components/catalogue/CatalogueContent';
+import { API_URL } from '@/lib/api';
+import { Product } from '@/types/product';
 
 function CatalogueFallback() {
   return (
@@ -16,10 +18,46 @@ function CatalogueFallback() {
   );
 }
 
-export default function CataloguePage() {
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function CataloguePage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const params = new URLSearchParams();
+  
+  Object.entries(resolvedParams).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      params.append(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach(v => params.append(key, v));
+    }
+  });
+
+  const query = params.toString();
+  
+  // Fetch both in parallel. 
+  // IMPORTANT: We fetch filters WITHOUT the category query so the sidebar always shows ALL brands/sizes
+  const [productsRes, filtersRes] = await Promise.all([
+    fetch(`${API_URL}/api/products?${query}`, { next: { revalidate: 60 } }),
+    fetch(`${API_URL}/api/products/filters`, { next: { revalidate: 3600 } })
+  ]);
+
+  let initialProducts: Product[] = [];
+  let initialFilters = { brands: [], sizes: [] };
+
+  if (productsRes.ok) initialProducts = await productsRes.json();
+  if (filtersRes.ok) {
+    const data = await filtersRes.json();
+    initialFilters = { brands: data.brands ?? [], sizes: data.sizes ?? [] };
+  }
+
   return (
     <Suspense fallback={<CatalogueFallback />}>
-      <CatalogueContent />
+      <CatalogueContent 
+        initialProducts={initialProducts} 
+        initialFilters={initialFilters} 
+      />
     </Suspense>
   );
 }

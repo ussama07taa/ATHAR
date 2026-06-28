@@ -2,75 +2,155 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { ChevronDown, X } from 'lucide-react';
 import CatalogueProductCard from '@/components/catalogue/CatalogueProductCard';
 import CatalogueFilters from '@/components/catalogue/CatalogueFilters';
 import MobileFilterDrawer from '@/components/catalogue/MobileFilterDrawer';
-import { Product } from '@/app/page';
-import { CategoryDetail } from '@/types/catalog';
+import { Product } from '@/types/product';
+import { LayoutGrid, Grid3X3, List, ChevronDown } from 'lucide-react';
 
-function getProductMinMaxPrice(product: Product) {
-  const prices = product.variants.map((v) => parseFloat(v.price));
-  return { min: Math.min(...prices), max: Math.max(...prices) };
+interface CatalogueContentProps {
+  initialProducts?: Product[];
+  initialFilters?: { brands: string[]; sizes: string[] };
+  isNiche?: boolean;
+  isPack?: boolean;
+  isArabic?: boolean;
 }
 
-export default function CatalogueContent() {
+export default function CatalogueContent({ 
+  initialProducts = [], 
+  initialFilters = { brands: [], sizes: [] },
+  isNiche = false,
+  isPack = false,
+  isArabic = false
+}: CatalogueContentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  
   const categorySlug = searchParams.get('category') ?? '';
   const brandFromUrl = searchParams.get('brand') ?? '';
   const sizeFromUrl = searchParams.get('size') ?? '';
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categoryDetail, setCategoryDetail] = useState<CategoryDetail | null>(null);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
+  const [viewMode, setViewMode] = useState<'grid4' | 'grid2'>('grid4');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
+  const [packViewType, setPackViewType] = useState<'custom' | 'fixed'>('custom');
+
+  // Filter states
   const [selectedBrand, setSelectedBrand] = useState(brandFromUrl);
   const [selectedSize, setSelectedSize] = useState(sizeFromUrl);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [filterOptions, setFilterOptions] = useState<{ brands: string[]; sizes: string[] }>({
-    brands: [],
-    sizes: [],
-  });
+  const [filterOptions, setFilterOptions] = useState<{ brands: string[]; sizes: string[] }>(initialFilters);
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(99999);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 99999 });
+
   const prevCategoryRef = useRef(categorySlug);
 
-  function clearAllFilters() {
+  // Sync state with URL params
+  useEffect(() => {
+    setSelectedBrand(brandFromUrl);
+    setSelectedSize(sizeFromUrl);
+  }, [brandFromUrl, sizeFromUrl]);
+
+  // Fetch filter options (Global - always show all brands/sizes)
+  useEffect(() => {
+    if (initialFilters.brands.length > 0 && prevCategoryRef.current === categorySlug) return;
+    
+    fetch('/api/products/filters')
+      .then((res) => res.json())
+      .then((data) => setFilterOptions({ brands: data.brands ?? [], sizes: data.sizes ?? [] }))
+      .catch(() => {});
+  }, [categorySlug]);
+
+
+  // Fetch products (only if filters change or initialProducts is empty)
+  useEffect(() => {
+    // Skip first fetch if we have initialData and params haven't changed since server render
+    const isInitialMount = products === initialProducts;
+    const hasFilters = selectedBrand || selectedSize;
+    
+    if (isInitialMount && !hasFilters && initialProducts.length > 0 && prevCategoryRef.current === categorySlug) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (categorySlug) params.set('category', categorySlug);
+    if (selectedBrand) params.set('brand', selectedBrand);
+    if (selectedSize) params.set('size', selectedSize);
+    if (isNiche) params.set('is_niche', '1');
+    if (isPack) params.set('is_pack', '1');
+    if (isArabic) params.set('is_arabic', '1');
+    
+    const genderParam = searchParams.get('gender');
+    if (genderParam && genderParam !== 'all') {
+      params.set('gender', genderParam);
+    }
+    
+    const url = `/api/products?${params.toString()}`;
+    
+    fetch(url)
+      .then((res) => res.json())
+      .then((data: Product[]) => {
+        setProducts(data);
+        if (data.length > 0) {
+          const allPrices = data.flatMap((p) => p.variants.map((v) => parseFloat(v.price)));
+          const min = Math.floor(Math.min(...allPrices));
+          const max = Math.ceil(Math.max(...allPrices));
+          setPriceRange({ min, max });
+          if (prevCategoryRef.current !== categorySlug) {
+            setPriceMin(min);
+            setPriceMax(max);
+          }
+        }
+        setLoading(false);
+        prevCategoryRef.current = categorySlug;
+      })
+      .catch(() => setLoading(false));
+  }, [categorySlug, selectedBrand, selectedSize, isNiche, isPack]); // REMOVED searchParams so gender tabs are instant client-side.
+
+  function updateUrl(brand: string, size: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (brand) params.set('brand', brand); else params.delete('brand');
+    if (size) params.set('size', size); else params.delete('size');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  const handleBrandChange = (b: string) => { setSelectedBrand(b); updateUrl(b, selectedSize); };
+  const handleSizeChange = (s: string) => { setSelectedSize(s); updateUrl(selectedBrand, s); };
+  const clearAllFilters = () => {
     setSelectedBrand('');
     setSelectedSize('');
     setPriceMin(priceRange.min);
     setPriceMax(priceRange.max);
-    updateFiltersInUrl('', '');
-  }
+    router.replace(categorySlug ? `${pathname}?category=${categorySlug}` : pathname, { scroll: false });
+  };
 
-  function updateFiltersInUrl(brand: string, size: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (categorySlug) params.set('category', categorySlug);
-    else params.delete('category');
+  const filteredProducts = useMemo(() => {
+    const genderFilter = searchParams.get('gender') || 'all';
 
-    if (brand) params.set('brand', brand);
-    else params.delete('brand');
+    let result = products.filter((p) => {
+      // Price Filter
+      const prices = p.variants.map(v => parseFloat(v.price));
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const inPriceRange = maxPrice >= priceMin && minPrice <= priceMax;
+      
+      // Gender Filter
+      const matchesGender = genderFilter === 'all' || p.gender === genderFilter || p.gender === 'unisex';
 
-    if (size) params.set('size', size);
-    else params.delete('size');
+      return inPriceRange && matchesGender;
+    });
 
-    const qs = params.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }
+    if (sortBy === 'price-asc') result.sort((a, b) => parseFloat(a.variants[0]?.price || '0') - parseFloat(b.variants[0]?.price || '0'));
+    if (sortBy === 'price-desc') result.sort((a, b) => parseFloat(b.variants[0]?.price || '0') - parseFloat(a.variants[0]?.price || '0'));
+    if (sortBy === 'alpha') result.sort((a, b) => a.name.localeCompare(b.name));
 
-  function handleBrandChange(brand: string) {
-    setSelectedBrand(brand);
-    updateFiltersInUrl(brand, selectedSize);
-  }
-
-  function handleSizeChange(size: string) {
-    setSelectedSize(size);
-    updateFiltersInUrl(selectedBrand, size);
-  }
+    return result;
+  }, [products, priceMin, priceMax, sortBy, searchParams]);
 
   const filterProps = {
     brands: filterOptions.brands,
@@ -82,271 +162,325 @@ export default function CatalogueContent() {
     priceRange,
     onBrandChange: handleBrandChange,
     onSizeChange: handleSizeChange,
-    onPriceChange: (min: number, max: number) => {
-      setPriceMin(min);
-      setPriceMax(max);
-    },
+    onPriceChange: (min: number, max: number) => { setPriceMin(min); setPriceMax(max); },
     onClearAll: clearAllFilters,
+    isNiche,
   };
 
-  useEffect(() => {
-    if (!categorySlug) {
-      setCategoryDetail(null);
-      return;
-    }
-    fetch(`/api/collections/${encodeURIComponent(categorySlug)}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setCategoryDetail(data))
-      .catch(() => setCategoryDetail(null));
-  }, [categorySlug]);
-
-  useEffect(() => {
-    if (prevCategoryRef.current === categorySlug) return;
-    prevCategoryRef.current = categorySlug;
-
-    setSelectedBrand('');
-    setSelectedSize('');
-
-    const params = new URLSearchParams();
-    if (categorySlug) params.set('category', categorySlug);
-    const qs = params.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [categorySlug, pathname, router]);
-
-  useEffect(() => {
-    setSelectedBrand(brandFromUrl);
-  }, [brandFromUrl]);
-
-  useEffect(() => {
-    setSelectedSize(sizeFromUrl);
-  }, [sizeFromUrl]);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (categorySlug) params.set('category', categorySlug);
-    const qs = params.toString();
-    fetch(`/api/products/filters${qs ? `?${qs}` : ''}`)
-      .then((res) => res.json())
-      .then((data) => setFilterOptions({ brands: data.brands ?? [], sizes: data.sizes ?? [] }))
-      .catch(() => {});
-  }, [categorySlug]);
-
-  useEffect(() => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (categorySlug) params.set('category', categorySlug);
-    if (selectedBrand) params.set('brand', selectedBrand);
-    if (selectedSize) params.set('size', selectedSize);
-    const qs = params.toString();
-    const url = qs ? `/api/products?${qs}` : '/api/products';
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data: Product[]) => {
-        setProducts(data);
-        if (data.length > 0) {
-          const allPrices = data.flatMap((p) => p.variants.map((v) => parseFloat(v.price)));
-          const min = Math.floor(Math.min(...allPrices));
-          const max = Math.ceil(Math.max(...allPrices));
-          setPriceRange({ min, max });
-          setPriceMin(min);
-          setPriceMax(max);
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [categorySlug, selectedBrand, selectedSize]);
-
-  const filteredProducts = useMemo(() => {
-    let result = products.filter((p) => {
-      const { min, max } = getProductMinMaxPrice(p);
-      return max >= priceMin && min <= priceMax;
-    });
-
-    switch (sortBy) {
-      case 'alphabetical-asc':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'alphabetical-desc':
-        result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'price-asc':
-        result.sort(
-          (a, b) =>
-            parseFloat(a.variants[0]?.price || '0') - parseFloat(b.variants[0]?.price || '0'),
-        );
-        break;
-      case 'price-desc':
-        result.sort(
-          (a, b) =>
-            parseFloat(b.variants[0]?.price || '0') - parseFloat(a.variants[0]?.price || '0'),
-        );
-        break;
-      default:
-        break;
-    }
-    return result;
-  }, [products, sortBy, priceMin, priceMax]);
-
-  const pageTitle = categoryDetail?.name ?? (categorySlug ? 'Produits' : 'Catalogue');
-
-  const breadcrumbs = categoryDetail
-    ? [
-        { label: 'Catalogue', href: '/catalogue?category=parfums' },
-        ...categoryDetail.ancestors.map((a) => ({
-          label: a.name,
-          href: `/catalogue?category=${a.slug}`,
-        })),
-        { label: categoryDetail.name, href: '' },
-      ]
-    : [{ label: 'Catalogue', href: '' }];
-
-  const activeTags = [
-    selectedBrand && { key: 'brand', label: selectedBrand, clear: () => handleBrandChange('') },
-    selectedSize && { key: 'size', label: selectedSize, clear: () => handleSizeChange('') },
-  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
-
   return (
-    <div className="catalogue-page min-h-screen bg-[#FAFAF8] pb-20 text-neutral-900 dark:bg-dark-900 dark:text-cream sm:pb-24">
-      <div className="mx-auto max-w-[1320px] px-5 md:px-8">
-        {/* Breadcrumbs */}
-        <nav
-          aria-label="Fil d'Ariane"
-          className="mb-6 flex flex-wrap items-center gap-2 pt-2 text-[10px] font-semibold tracking-[0.14em] text-neutral-400 uppercase sm:mb-8"
-        >
-          <Link href="/" className="text-gold transition-opacity hover:opacity-70">
-            Athar
-          </Link>
-          {breadcrumbs.map((crumb, i) => (
-            <span key={i} className="flex items-center gap-2">
-              <span className="text-neutral-300 dark:text-white/20">/</span>
-              {crumb.href ? (
-                <Link href={crumb.href} className="text-gold transition-opacity hover:opacity-70">
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span className="text-neutral-600 dark:text-cream-dim">{crumb.label}</span>
-              )}
-            </span>
-          ))}
-        </nav>
+    <div style={{ 
+      background: isNiche ? '#FCFBFA' : '#fff', 
+      minHeight: '100vh', 
+      paddingTop: '20px',
+      color: '#1C1917',
+      transition: 'background 500ms ease'
+    }}>
+      
+      <style>{`
+        .cat-container { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+        .cat-sidebar { width: 240px; flex-shrink: 0; display: none; }
+        @media (min-width: 1024px) { .cat-sidebar { display: block; } }
+        
+        .cat-main { flex: 1; min-width: 0; }
+        .cat-grid { display: grid; gap: 20px 15px; padding-bottom: 80px; }
+        .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); gap: 40px 25px; } }
+        
+        .skeleton-item { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        {/* Hero title */}
-        <header className="mb-12 text-center md:mb-16">
-          <p className="mb-3 text-[10px] font-semibold tracking-[0.28em] text-gold-dim uppercase">
-            Maison de Parfums
-          </p>
-          <h1 className="font-display text-3xl font-medium tracking-[0.04em] text-neutral-900 uppercase dark:text-cream sm:text-4xl md:text-5xl">
-            {pageTitle}
-          </h1>
-          <div className="mx-auto mt-5 h-px w-12 bg-gradient-to-r from-transparent via-gold to-transparent" />
-        </header>
+        /* Niche Variations */
+        .niche-text { color: #D4AF37 !important; }
+        .niche-border { border-color: rgba(212, 175, 55, 0.2) !important; }
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-14">
-          <CatalogueFilters {...filterProps} />
+        /* Custom Sort Dropdown Style */
+        .sort-select {
+          appearance: none;
+          background: none;
+          border: none;
+          font-size: 0.65rem;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #1C1917;
+          cursor: pointer;
+          padding-right: 20px;
+        }
+      `}</style>
 
-          <div className="min-w-0 flex-1">
-            {/* Mobile filters */}
-            <div className="mb-6 lg:hidden">
-              <MobileFilterDrawer
-                {...filterProps}
-                isOpen={mobileFiltersOpen}
-                onOpen={() => setMobileFiltersOpen(true)}
-                onClose={() => setMobileFiltersOpen(false)}
-              />
-            </div>
+      <div className="cat-container">
+        {/* Sidebar */}
+        <aside className="cat-sidebar">
+          <CatalogueFilters {...filterProps} showHeader={true} />
+        </aside>
 
-            {/* Toolbar */}
-            <div className="mb-5 flex flex-col gap-3 border-b border-neutral-200/80 pb-4 dark:border-white/10 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-neutral-500 dark:text-cream-dim">
-                <span className="font-medium text-neutral-900 dark:text-cream">{filteredProducts.length}</span>{' '}
-                {filteredProducts.length === 1 ? 'produit' : 'produits'}
-                {products.length !== filteredProducts.length && (
-                  <span> sur {products.length}</span>
-                )}
-              </p>
-
-              <div className="relative">
-                <label htmlFor="catalogue-sort" className="sr-only">
-                  Trier par
-                </label>
-                <select
-                  id="catalogue-sort"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="catalogue-sort appearance-none rounded-full border border-neutral-200 bg-white py-2.5 pr-10 pl-4 text-[13px] font-medium text-neutral-800 transition-colors hover:border-neutral-400 focus:border-neutral-900 focus:outline-none dark:border-white/10 dark:bg-dark-800 dark:text-cream dark:hover:border-gold/30 dark:focus:border-gold/50"
-                >
-                  <option value="newest">Nouveautés</option>
-                  <option value="alphabetical-asc">Alphabétique, A–Z</option>
-                  <option value="alphabetical-desc">Alphabétique, Z–A</option>
-                  <option value="price-asc">Prix croissant</option>
-                  <option value="price-desc">Prix décroissant</option>
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-neutral-400"
+        {/* Main Content */}
+        <div className="cat-main">
+          
+          {/* Top Control Bar */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            padding: '12px 0',
+            borderBottom: `1px solid ${isNiche ? 'rgba(202,138,4,0.1)' : '#f0f0f0'}`,
+            marginBottom: '10px',
+            position: 'relative'
+          }}>
+            {/* Left: View Switches & Mobile Filter Toggle */}
+            <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10, color: '#ccc' }} className="desktop-only">
+                <LayoutGrid 
+                  size={18} 
+                  style={{ cursor: 'pointer', color: viewMode === 'grid4' ? '#111' : '#ccc' }} 
+                  onClick={() => setViewMode('grid4')}
+                />
+                <Grid3X3 
+                  size={18} 
+                  style={{ cursor: 'pointer', color: viewMode === 'grid2' ? '#111' : '#ccc' }} 
+                  onClick={() => setViewMode('grid2')}
                 />
               </div>
+              
+              <button 
+                onClick={() => setMobileFiltersOpen(true)}
+                style={{ 
+                  background: 'none', border: 'none', fontSize: '0.65rem', fontWeight: 700, 
+                  letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: 6
+                }}
+                className="lg:hidden"
+              >
+                 Filtres
+              </button>
             </div>
 
-            {/* Active filter tags */}
-            {activeTags.length > 0 && (
-              <div className="mb-6 flex flex-wrap gap-2">
-                {activeTags.map((tag) => (
-                  <button
-                    key={tag.key}
-                    type="button"
-                    onClick={tag.clear}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[12px] font-medium text-neutral-700 transition-colors hover:border-neutral-900 dark:border-white/10 dark:bg-dark-800 dark:text-cream-dim dark:hover:border-gold/40"
-                  >
-                    {tag.label}
-                    <X size={12} />
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={clearAllFilters}
-                  className="text-[12px] font-medium text-neutral-400 underline-offset-2 hover:text-neutral-900 hover:underline"
-                >
-                  Tout effacer
-                </button>
-              </div>
-            )}
+            {/* Center: Count — hidden on mobile to avoid overlap */}
+            <div style={{ 
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: '#999',
+              display: 'flex',
+              alignItems: 'center',
+            }} className="desktop-only">
+              {filteredProducts.length} PRODUITS
+            </div>
 
-            {loading ? (
-              <div className="grid grid-cols-2 gap-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 xl:grid-cols-4 xl:gap-x-5 xl:gap-y-12">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="aspect-[4/5] bg-neutral-200/60" />
-                    <div className="mt-4 h-3 w-16 bg-neutral-200/60" />
-                    <div className="mt-2 h-4 w-full bg-neutral-200/60" />
-                    <div className="mt-3 h-4 w-20 bg-neutral-200/60" />
-                  </div>
-                ))}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="rounded-2xl border border-neutral-200/80 bg-white py-20 text-center dark:border-white/10 dark:bg-dark-800 sm:py-24">
-                <p className="font-display text-xl text-neutral-800 dark:text-cream sm:text-2xl">Aucun produit trouvé</p>
-                <p className="mx-auto mt-3 max-w-sm text-sm text-neutral-500">
-                  Essayez de modifier vos filtres ou explorez une autre catégorie.
-                </p>
-                <Link
-                  href="/catalogue?category=parfums"
-                  className="mt-8 inline-block border border-neutral-900 px-6 py-3 text-[11px] font-bold tracking-[0.14em] text-neutral-900 uppercase transition-colors hover:bg-neutral-900 hover:text-white dark:border-gold dark:text-gold dark:hover:bg-gold dark:hover:text-dark-900 sm:px-8"
-                >
-                  Voir tous les parfums
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 xl:grid-cols-4 xl:gap-x-5 xl:gap-y-12">
-                {filteredProducts.map((p) => (
-                  <CatalogueProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            )}
+            {/* Right: Sort */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <select 
+                className="sort-select" 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="newest">Nouveautés</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+                <option value="alpha">A-Z</option>
+              </select>
+              <ChevronDown size={12} style={{ position: 'absolute', right: 0, pointerEvents: 'none' }} />
+            </div>
           </div>
+
+          {/* Gender Filter Tabs */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 40, 
+            marginBottom: 20,
+            borderBottom: '1px solid #f0f0f0',
+            paddingBottom: 15
+          }}>
+            {[
+              { id: 'all', label: 'TOUT' },
+              { id: 'homme', label: 'HOMME' },
+              { id: 'femme', label: 'FEMME' }
+            ].map((tab) => {
+              const isActive = (searchParams.get('gender') || 'all') === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (tab.id === 'all') params.delete('gender');
+                    else params.set('gender', tab.id);
+                    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1rem',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    color: isActive ? '#111' : '#999',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    padding: '0 5px 10px',
+                    transition: 'color 300ms ease'
+                  }}
+                >
+                  {tab.label}
+                  {isActive && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      bottom: 0, 
+                      left: 0, 
+                      right: 0, 
+                      height: 2, 
+                      background: '#111' 
+                    }} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Grid or Grouped Pack Sections */}
+          {isPack ? (
+            <div>
+              {(() => {
+                const customPacks = filteredProducts.filter(p => p.is_custom_pack);
+                const fixedPacks = filteredProducts.filter(p => !p.is_custom_pack);
+
+                if (filteredProducts.length === 0) {
+                  return (
+                    <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                      <p style={{ color: '#999', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        Aucun pack disponible dans cet univers pour le moment.
+                      </p>
+                    </div>
+                  );
+                }
+
+                // Force view to 'custom' if 'fixed' is selected but empty (and vice versa)
+                const currentView = 
+                  (packViewType === 'custom' && customPacks.length === 0 && fixedPacks.length > 0) ? 'fixed' :
+                  (packViewType === 'fixed' && fixedPacks.length === 0 && customPacks.length > 0) ? 'custom' :
+                  packViewType;
+
+                const activePacks = currentView === 'custom' ? customPacks : fixedPacks;
+
+                return (
+                  <>
+                    {/* Clean Segmented Toggle UI */}
+                    {customPacks.length > 0 && fixedPacks.length > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: 16,
+                        marginBottom: 40,
+                      }}>
+                        <button
+                          onClick={() => setPackViewType('custom')}
+                          style={{
+                            padding: '12px 24px',
+                            borderRadius: 999,
+                            background: currentView === 'custom' ? '#111' : '#F9F8F6',
+                            color: currentView === 'custom' ? '#fff' : '#111',
+                            border: currentView === 'custom' ? '1px solid #111' : '1px solid rgba(0,0,0,0.08)',
+                            fontSize: '0.75rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            cursor: 'pointer',
+                            transition: 'all 300ms ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8
+                          }}
+                        >
+                          Je compose mon coffret <span style={{ opacity: 0.6 }}>({customPacks.length})</span>
+                        </button>
+                        <button
+                          onClick={() => setPackViewType('fixed')}
+                          style={{
+                            padding: '12px 24px',
+                            borderRadius: 999,
+                            background: currentView === 'fixed' ? '#111' : '#F9F8F6',
+                            color: currentView === 'fixed' ? '#fff' : '#111',
+                            border: currentView === 'fixed' ? '1px solid #111' : '1px solid rgba(0,0,0,0.08)',
+                            fontSize: '0.75rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            cursor: 'pointer',
+                            transition: 'all 300ms ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8
+                          }}
+                        >
+                          Prêts-à-offrir <span style={{ opacity: 0.6 }}>({fixedPacks.length})</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Description of current mode */}
+                    <div style={{ marginBottom: 30, paddingBottom: 15, borderBottom: currentView === 'custom' ? '2px solid #CA8A04' : '2px solid #111', display: 'inline-block' }}>
+                      <h2 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        {currentView === 'custom' ? 'Packs Decante Personnalisables' : 'Packs Decante Prêts-à-offrir'}
+                      </h2>
+                      <p style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>
+                        {currentView === 'custom' 
+                          ? 'Libérez votre créativité et composez votre pack sur mesure.'
+                          : 'Une sélection experte de nos fragrances les plus appréciées.'}
+                      </p>
+                    </div>
+
+                    {/* Shared Grid */}
+                    <div className={`cat-grid ${viewMode === 'grid4' ? 'grid-4' : 'grid-2'}`}>
+                      {activePacks.map((p, idx) => (
+                        <CatalogueProductCard key={p.id} product={p} priority={idx < 4} isNiche={isNiche} />
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          ) : (
+            <div className={`cat-grid ${viewMode === 'grid4' ? 'grid-4' : 'grid-2'}`}>
+              {loading ? (
+                [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="skeleton-item" style={{ aspectRatio: '1/1', background: '#f5f5f5', borderRadius: 4 }} />
+                ))
+              ) : (
+                filteredProducts.map((p, idx) => (
+                  <CatalogueProductCard key={p.id} product={p} priority={idx < 4} isNiche={isNiche} />
+                ))
+              )}
+            </div>
+          )}
+          
+          {!loading && filteredProducts.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '100px 0' }}>
+              <p style={{ fontSize: '0.9rem', color: '#999', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Aucun produit ne correspond à vos filtres
+              </p>
+              <button 
+                onClick={clearAllFilters}
+                style={{ 
+                  marginTop: 20, background: 'none', border: 'none', 
+                  borderBottom: '1px solid #111', fontSize: '0.7rem', 
+                  fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' 
+                }}
+              >
+                Tout effacer
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      <MobileFilterDrawer
+        {...filterProps}
+        isOpen={mobileFiltersOpen}
+        onOpen={() => setMobileFiltersOpen(true)}
+        onClose={() => setMobileFiltersOpen(false)}
+      />
     </div>
   );
 }

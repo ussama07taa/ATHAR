@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal, X } from 'lucide-react';
+import { X, SlidersHorizontal } from 'lucide-react';
 import { FilterPanel, CatalogueFiltersProps } from '@/components/catalogue/CatalogueFilters';
 
 interface MobileFilterDrawerProps extends CatalogueFiltersProps {
@@ -25,45 +25,80 @@ export default function MobileFilterDrawer({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-[11px] font-bold tracking-[0.16em] text-neutral-900 uppercase transition-all hover:border-neutral-900 dark:border-white/15 dark:bg-dark-800 dark:text-cream dark:hover:border-gold/40 lg:hidden"
-      >
-        <SlidersHorizontal size={15} strokeWidth={1.5} />
-        Filtres
-        {activeCount > 0 && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-neutral-900 px-1.5 text-[10px] text-white">
-            {activeCount}
-          </span>
-        )}
-      </button>
-
       {isOpen && (
-        <div className="fixed inset-0 z-[200] lg:hidden">
-          <button
-            type="button"
-            aria-label="Fermer les filtres"
-            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Overlay */}
+          <div 
             onClick={onClose}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(2px)'
+            }}
           />
-          <div className="absolute right-0 bottom-0 left-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white px-6 pt-4 pb-8 shadow-2xl dark:bg-dark-800">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[11px] font-bold tracking-[0.18em] uppercase dark:text-cream">Filtres</p>
-              <button
-                type="button"
+          
+          {/* Content */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            maxHeight: '90vh',
+            background: '#fff',
+            borderRadius: '20px 20px 0 0',
+            padding: '24px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '20px'
+            }}>
+              <p style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                margin: 0
+              }}>
+                Filtres {activeCount > 0 && `(${activeCount})`}
+              </p>
+              <button 
                 onClick={onClose}
-                className="rounded-full p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-cream-dim dark:hover:bg-dark-700 dark:hover:text-cream"
-                aria-label="Fermer"
+                style={{ background: 'none', border: 'none', padding: 8, cursor: 'pointer' }}
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
-            <FilterPanel {...filterProps} />
+
+            <FilterPanel {...filterProps} showHeader={false} />
+
             <button
-              type="button"
               onClick={onClose}
-              className="mt-6 w-full bg-neutral-900 py-4 text-[11px] font-bold tracking-[0.16em] text-white uppercase dark:bg-gold dark:text-dark-900"
+              style={{
+                marginTop: '30px',
+                width: '100%',
+                background: '#111',
+                color: '#fff',
+                padding: '16px',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                border: 'none',
+                cursor: 'pointer'
+              }}
             >
               Voir les résultats
             </button>

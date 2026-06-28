@@ -2,9 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const routeLabels: Record<string, string> = {
   catalogue: 'Catalogue',
@@ -20,9 +19,9 @@ export default function Breadcrumbs() {
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
   const isLight = mounted && resolvedTheme === 'light';
+
+  useEffect(() => { setMounted(true); }, []);
 
   if (!pathname || pathname === '/') return null;
 
@@ -32,28 +31,26 @@ export default function Breadcrumbs() {
     <nav 
       aria-label="Breadcrumb"
       style={{
-        maxWidth: 1140,
+        maxWidth: 1200,
         margin: '0 auto',
-        padding: '24px 24px 0',
+        padding: '24px 20px 0',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
-        fontSize: '0.72rem',
+        gap: 8,
+        fontSize: '0.65rem',
         fontWeight: 600,
-        color: isLight ? '#9CA3AF' : '#6B6654',
+        color: isLight ? '#44403C' : '#A8A29E',
         textTransform: 'uppercase',
-        letterSpacing: '0.12em',
+        letterSpacing: '0.2em',
       }}
     >
       <Link 
         href="/" 
         style={{ 
-          color: '#C8A25C', 
+          color: '#CA8A04', 
           textDecoration: 'none',
           transition: 'opacity 200ms',
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
       >
         ATHAR
       </Link>
@@ -64,22 +61,20 @@ export default function Breadcrumbs() {
         const label = routeLabels[p] || p.charAt(0).toUpperCase() + p.slice(1).replace(/-/g, ' ');
 
         return (
-          <div key={href} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ opacity: 0.5 }}>/</span>
+          <div key={href} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ opacity: 0.3, color: isLight ? '#44403C' : '#A8A29E' }}>/</span>
             {isLast ? (
-              <span style={{ color: isLight ? '#374151' : '#C8BEA8' }}>
+              <span style={{ color: isLight ? '#111827' : '#F2EDE2', fontWeight: 700 }}>
                 {label}
               </span>
             ) : (
               <Link 
                 href={href}
                 style={{ 
-                  color: '#C8A25C', 
+                  color: '#CA8A04', 
                   textDecoration: 'none',
                   transition: 'opacity 200ms',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
               >
                 {label}
               </Link>

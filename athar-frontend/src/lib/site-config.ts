@@ -1,6 +1,6 @@
 export const siteConfig = {
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '+212 6 61 23 45 67',
-  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '212661234567',
+  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '+212 755-887106',
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '212755887106',
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'contact@athar.ma',
   city: process.env.NEXT_PUBLIC_CONTACT_CITY ?? 'Tanger, Maroc',
   shippingFreeThreshold: Number(process.env.NEXT_PUBLIC_SHIPPING_FREE_THRESHOLD ?? 500),

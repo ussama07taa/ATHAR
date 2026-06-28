@@ -226,6 +226,9 @@ class OrderResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
+                        ->modalHeading('Confirmer la commande')
+                        ->modalDescription('Êtes-vous sûr de vouloir confirmer cette commande ?')
+                        ->modalSubmitActionLabel('Oui, confirmer')
                         ->action(fn (Order $record) => $record->update(['status' => 'confirmed']))
                         ->visible(fn (Order $record) => $record->status === 'pending'),
                     
@@ -234,15 +237,31 @@ class OrderResource extends Resource
                         ->icon('heroicon-o-truck')
                         ->color('warning')
                         ->requiresConfirmation()
+                        ->modalHeading('Expédier la commande')
+                        ->modalDescription('Ceci marquera la commande comme expédiée. Voulez-vous continuer ?')
+                        ->modalSubmitActionLabel('Oui, expédier')
                         ->action(fn (Order $record) => $record->update(['status' => 'shipped']))
                         ->visible(fn (Order $record) => $record->status === 'confirmed'),
+
+                    Tables\Actions\Action::make('deliver')
+                        ->label('Livré')
+                        ->icon('heroicon-o-gift')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Commande Livrée')
+                        ->modalDescription('Le client a reçu le colis et réglé le paiement (COD) ?')
+                        ->modalSubmitActionLabel('Oui, marquer Livré')
+                        ->action(fn (Order $record) => $record->update(['status' => 'delivered']))
+                        ->visible(fn (Order $record) => $record->status === 'shipped'),
 
                     Tables\Actions\Action::make('cancel')
                         ->label('Annuler')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalDescription('Le stock sera remis en inventaire.')
+                        ->modalHeading('Annuler la commande')
+                        ->modalDescription('Le stock sera remis en inventaire. Êtes-vous sûr ?')
+                        ->modalSubmitActionLabel('Oui, annuler')
                         ->action(fn (Order $record) => $record->update(['status' => 'cancelled']))
                         ->visible(fn (Order $record) => ! in_array($record->status, ['cancelled', 'delivered'], true)),
 
@@ -266,7 +285,7 @@ class OrderResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['items.variant'])
+            // ->with(['items.variant']) // Temporarily suspended to check Livewire serialization bug
             ->latest();
     }
 

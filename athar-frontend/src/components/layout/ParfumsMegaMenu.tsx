@@ -17,19 +17,18 @@ export default function ParfumsMegaMenu({ parfums, isLight, onClose }: ParfumsMe
         top: '100%',
         left: '50%',
         transform: 'translateX(-50%)',
-        marginTop: 8,
+        marginTop: 12,
         minWidth: 480,
-        background: isLight ? '#F9F9F9' : '#1A1A1C',
-        border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}`,
-        borderRadius: 4,
-        boxShadow: isLight
-          ? '0 8px 32px rgba(0,0,0,0.08)'
-          : '0 8px 32px rgba(0,0,0,0.4)',
-        padding: '32px 40px',
+        background: isLight ? '#FFFFFF' : '#0D0D0F',
+        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+        borderRadius: 8,
+        boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+        padding: '40px 48px',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: 48,
+        gap: 56,
         zIndex: 200,
+        transition: 'background 300ms ease, border-color 300ms ease, box-shadow 300ms ease'
       }}
     >
       {parfums.children?.map((group) => (
@@ -41,15 +40,16 @@ export default function ParfumsMegaMenu({ parfums, isLight, onClose }: ParfumsMe
               display: 'block',
               fontSize: '0.9rem',
               fontWeight: 700,
-              color: isLight ? '#333333' : '#F2EDE2',
+              color: isLight ? '#111827' : '#F2EDE2',
               textDecoration: 'none',
               marginBottom: 16,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase'
             }}
           >
             {group.name}
           </Link>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {group.children?.map((sub) => (
               <li key={sub.slug}>
                 <Link
@@ -57,15 +57,15 @@ export default function ParfumsMegaMenu({ parfums, isLight, onClose }: ParfumsMe
                   onClick={onClose}
                   style={{
                     fontSize: '0.85rem',
-                    color: isLight ? '#666666' : '#9B9585',
+                    color: isLight ? '#44403C' : '#A8A29E',
                     textDecoration: 'none',
                     transition: 'color 200ms ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = isLight ? '#333333' : '#F2EDE2';
+                    e.currentTarget.style.color = isLight ? '#111827' : '#F2EDE2';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = isLight ? '#666666' : '#9B9585';
+                    e.currentTarget.style.color = isLight ? '#44403C' : '#A8A29E';
                   }}
                 >
                   {sub.name}
@@ -79,8 +79,8 @@ export default function ParfumsMegaMenu({ parfums, isLight, onClose }: ParfumsMe
       <div
         style={{
           gridColumn: '1 / -1',
-          borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
-          paddingTop: 16,
+          borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+          paddingTop: 20,
           marginTop: -8,
         }}
       >
@@ -89,15 +89,35 @@ export default function ParfumsMegaMenu({ parfums, isLight, onClose }: ParfumsMe
           onClick={onClose}
           style={{
             fontSize: '0.8rem',
-            fontWeight: 600,
-            color: '#C8A25C',
+            fontWeight: 700,
+            color: '#CA8A04',
             textDecoration: 'none',
-            letterSpacing: '0.05em',
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
+            transition: 'opacity 200ms ease'
           }}
+          onMouseOver={(e) => (e.currentTarget.style.opacity = '0.7')}
+          onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
         >
           Voir tous les parfums →
         </Link>
+          <Link
+            href="/parfums-arabic"
+            onClick={onClose}
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: '#CA8A04',
+              textDecoration: 'none',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              transition: 'opacity 200ms ease',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.opacity = '0.7')}
+            onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
+          >
+            Parfums Arabic →
+          </Link>
       </div>
     </div>
   );

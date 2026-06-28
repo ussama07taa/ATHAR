@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import useCartStore from '@/store/cartStore';
+import Image from 'next/image';
 
 export default function CartDrawer() {
   const items = useCartStore((s) => s.items);
@@ -14,8 +15,8 @@ export default function CartDrawer() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const totalPrice = useCartStore((s) => s.totalPrice());
   const totalItems = useCartStore((s) => s.totalItems());
-  const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
 
   // Lock body scroll when drawer is open
@@ -25,6 +26,8 @@ export default function CartDrawer() {
   }, [isOpen]);
 
   useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
@@ -62,22 +65,21 @@ export default function CartDrawer() {
               width: '100%',
               maxWidth: 420,
               zIndex: 101,
-              background: isLight
-                ? 'linear-gradient(160deg, rgba(255,255,255,0.99) 0%, rgba(245,242,236,0.99) 100%)'
-                : 'linear-gradient(160deg, rgba(26,26,29,0.98) 0%, rgba(13,13,15,0.99) 100%)',
+              background: isLight ? '#FFFFFF' : '#0D0D0F',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              borderLeft: `1px solid ${isLight ? 'rgba(200,162,92,0.3)' : 'rgba(200,162,92,0.2)'}`,
+              borderLeft: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
               display: 'flex',
               flexDirection: 'column',
-              transition: 'background 300ms ease',
+              transition: 'all 300ms ease',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
             }}
           >
             {/* Header */}
             <div
               style={{
                 padding: '24px 24px 20px',
-                borderBottom: '1px solid rgba(200,162,92,0.12)',
+                borderBottom: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -91,12 +93,11 @@ export default function CartDrawer() {
                     fontWeight: 700,
                     color: isLight ? '#111827' : '#F2EDE2',
                     letterSpacing: '0.05em',
-                    transition: 'color 300ms ease',
                   }}
                 >
                   Votre Panier
                 </h2>
-                <p style={{ margin: 0, fontSize: '0.7rem', color: '#9B7A3D', marginTop: 2 }}>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: '#CA8A04', marginTop: 2, fontWeight: 600 }}>
                   {totalItems} article{totalItems !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -106,10 +107,10 @@ export default function CartDrawer() {
                 style={{
                   width: 36,
                   height: 36,
-                  borderRadius: 10,
+                  borderRadius: '50%',
                   background: 'transparent',
-                  border: '1px solid rgba(200,162,92,0.2)',
-                  color: '#C8BEA8',
+                  border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+                  color: isLight ? '#44403C' : '#A8A29E',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -117,12 +118,12 @@ export default function CartDrawer() {
                   transition: 'all 200ms',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(200,162,92,0.5)';
-                  e.currentTarget.style.color = '#C8A25C';
+                  e.currentTarget.style.borderColor = '#CA8A04';
+                  e.currentTarget.style.color = '#CA8A04';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(200,162,92,0.2)';
-                  e.currentTarget.style.color = '#C8BEA8';
+                  e.currentTarget.style.borderColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.color = isLight ? '#44403C' : '#A8A29E';
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -142,11 +143,11 @@ export default function CartDrawer() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 12,
-                    color: '#6B6654',
+                    color: isLight ? '#44403C' : '#A8A29E',
                     padding: '48px 0',
                   }}
                 >
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(200,162,92,0.25)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(202,138,4,0.2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" />
                   </svg>
                   <p style={{ margin: 0, fontSize: '0.875rem' }}>Votre panier est vide</p>
@@ -154,11 +155,14 @@ export default function CartDrawer() {
                     onClick={closeCart}
                     style={{
                       fontSize: '0.75rem',
-                      color: '#C8A25C',
+                      color: '#CA8A04',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
                       textDecoration: 'underline',
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase'
                     }}
                   >
                     Découvrir la collection →
@@ -167,123 +171,131 @@ export default function CartDrawer() {
               ) : (
                 items.map((item, i) => (
                   <motion.div
-                    key={item.variantId}
+                    key={item.cartId}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                     style={{
-                      background: isLight ? 'rgba(200,162,92,0.06)' : 'rgba(200,162,92,0.05)',
-                      border: `1px solid ${isLight ? 'rgba(200,162,92,0.2)' : 'rgba(200,162,92,0.15)'}`,
+                      background: isLight ? '#FAFAFA' : '#1C1917',
+                      border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
                       borderRadius: 14,
                       padding: '14px 16px',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      transition: 'background 300ms ease',
+                      transition: 'all 300ms ease',
                     }}
                   >
-                    {/* Product Image / Bottle indicator */}
+                    {/* Product Image */}
                     <div
                       style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 12,
-                        background: 'rgba(200,162,92,0.1)',
+                        width: 54,
+                        height: 54,
+                        borderRadius: 8,
+                        background: isLight ? '#FFFFFF' : '#0D0D0F',
                         flexShrink: 0,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         overflow: 'hidden',
-                        border: '1px solid rgba(200,162,92,0.2)',
+                        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+                        position: 'relative'
                       }}
                     >
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.productName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <Image src={item.imageUrl} alt={item.productName} fill sizes="54px" style={{ objectFit: 'cover' }} />
                       ) : (
-                        <svg width="20" height="20" viewBox="0 0 54 90" fill="none">
-                          <rect x="18" y="0" width="18" height="10" rx="3" fill="#C8A25C" opacity={0.7} />
-                          <rect x="22" y="10" width="10" height="8" fill="#C8A25C" opacity={0.5} />
-                          <rect x="8" y="18" width="38" height="60" rx="10" stroke="#C8A25C" strokeWidth="4" />
-                        </svg>
+                        <div style={{ width: '100%', height: '100%', background: isLight ? '#FFFFFF' : '#0D0D0F' }} />
                       )}
                     </div>
-
+211: 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: isLight ? '#111827' : '#F2EDE2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', transition: 'color 300ms ease' }}>
+                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: isLight ? '#111827' : '#F2EDE2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {item.productName}
                       </p>
-                      <p style={{ margin: 0, fontSize: '0.7rem', color: '#9B7A3D', marginTop: 2 }}>
-                        {item.variantName} — {item.price.toFixed(2)} MAD
+                      
+                      {/* Bundle Contents (NEW) */}
+                      {item.bundleContents && item.bundleContents.length > 0 && (
+                        <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          {item.bundleContents.map((p, idx) => (
+                            <div key={idx} style={{ fontSize: '0.65rem', color: isLight ? '#666' : '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ color: '#CA8A04' }}>•</span> {p.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+228: 
+                      <p style={{ margin: 0, fontSize: '0.725rem', color: '#CA8A04', marginTop: 3, fontWeight: 500 }}>
+                        {item.variantName} — {item.price.toFixed(2)} dh
                       </p>
                     </div>
-
+233: 
                     {/* Qty Controls */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '20px', padding: '2px' }}>
+                        <button
+                          onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            border: 'none',
+                            background: 'transparent',
+                            color: isLight ? '#111827' : '#F2EDE2',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 200ms',
+                          }}
+                        >
+                          −
+                        </button>
+                        <span style={{ minWidth: 20, textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            border: 'none',
+                            background: 'transparent',
+                            color: isLight ? '#111827' : '#F2EDE2',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 200ms',
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                      
                       <button
-                        onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          border: '1px solid rgba(200,162,92,0.3)',
-                          background: 'transparent',
-                          color: '#C8A25C',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 200ms',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200,162,92,0.1)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        −
-                      </button>
-                      <span style={{ minWidth: 20, textAlign: 'center', fontSize: '0.85rem', fontWeight: 600, color: isLight ? '#111827' : '#F2EDE2' }}>
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          border: '1px solid rgba(200,162,92,0.3)',
-                          background: 'transparent',
-                          color: '#C8A25C',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 200ms',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200,162,92,0.1)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeItem(item.variantId)}
+                        onClick={() => removeItem(item.cartId)}
                         aria-label="Supprimer"
                         style={{
                           width: 28,
                           height: 28,
-                          borderRadius: 8,
-                          background: 'transparent',
-                          border: '1px solid rgba(229,115,115,0.25)',
-                          color: '#E57373',
+                          borderRadius: '8px',
+                          background: 'rgba(239, 68, 68, 0.05)',
+                          border: '1px solid rgba(239, 68, 68, 0.1)',
+                          color: '#ef4444',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'all 200ms',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(229,115,115,0.1)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'; }}
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
                       </button>
                     </div>
@@ -296,11 +308,12 @@ export default function CartDrawer() {
             {items.length > 0 && (
               <div
                 style={{
-                  padding: '20px 24px 28px',
-                  borderTop: '1px solid rgba(200,162,92,0.12)',
+                  padding: '24px 24px 32px',
+                  borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 12,
+                  gap: 16,
+                  background: isLight ? '#FAFAFA' : '#1C1917',
                 }}
               >
                 {/* Total */}
@@ -309,32 +322,52 @@ export default function CartDrawer() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '12px 16px',
-                    borderRadius: 12,
-                    background: 'rgba(200,162,92,0.07)',
-                    border: '1px solid rgba(200,162,92,0.15)',
                   }}
                 >
-                  <span style={{ fontSize: '0.8rem', color: '#C8BEA8' }}>Total</span>
-                  <span style={{ fontSize: '1.15rem', fontWeight: 700, color: '#C8A25C' }}>
-                    {totalPrice.toFixed(2)} MAD
+                  <span style={{ fontSize: '0.85rem', color: isLight ? '#44403C' : '#A8A29E', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Sous-total</span>
+                  <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#CA8A04' }}>
+                    {totalPrice.toFixed(2)} dh
                   </span>
                 </div>
 
                 {/* COD Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B7A3D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(202, 138, 4, 0.05)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(202, 138, 4, 0.1)' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="2" />
                   </svg>
-                  <span style={{ fontSize: '0.65rem', color: '#9B7A3D', letterSpacing: '0.05em' }}>
-                    Paiement à la livraison — aucune carte requise
+                  <span style={{ fontSize: '0.65rem', color: '#A16207', letterSpacing: '0.05em', fontWeight: 600, textTransform: 'uppercase' }}>
+                    Paiement à la livraison
                   </span>
                 </div>
 
                 {/* Checkout CTA */}
                 <Link href="/checkout" onClick={closeCart} style={{ textDecoration: 'none' }}>
-                  <button className="btn-gold" style={{ width: '100%' }}>
-                    Commander maintenant
+                  <button 
+                    style={{ 
+                      width: '100%',
+                      background: '#CA8A04',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      transition: 'all 300ms ease',
+                      boxShadow: '0 10px 20px rgba(202, 138, 4, 0.2)'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = '#A16207';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = '#CA8A04';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    Confirmer la commande
                   </button>
                 </Link>
               </div>

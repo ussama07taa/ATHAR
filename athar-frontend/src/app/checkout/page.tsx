@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useCartStore from '@/store/cartStore';
 import { parseApiError } from '@/lib/api';
 import { calcShipping, siteConfig } from '@/lib/site-config';
+import { useTheme } from 'next-themes';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -20,9 +21,16 @@ type AppliedPromo = {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const items = useCartStore((s) => s.items);
   const totalPrice = useCartStore((s) => s.totalPrice());
   const clearCart = useCartStore((s) => s.clearCart);
+  const [mounted, setMounted] = useState(false);
+  const isLight = mounted && resolvedTheme === 'light';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [form, setForm] = useState({
     customer_name: '',
@@ -123,26 +131,26 @@ export default function CheckoutPage() {
 
   if (status === 'success') {
     return (
-      <main className="min-h-[80vh] flex items-center justify-center py-10 px-6 bg-[#FAFAFA] dark:bg-[#0D0D0F] transition-colors duration-500">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-[#1A1A1D]/95 border border-[#C8A25C]/25 rounded-[28px] p-12 max-w-[480px] w-full text-center flex flex-col items-center gap-5 shadow-2xl transition-colors duration-500">
-          <div className="w-18 h-18 rounded-full bg-[#C8A25C]/10 border-2 border-[#C8A25C] flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C8A25C" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+      <main style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', background: isLight ? '#FFFFFF' : '#0D0D0F', transition: 'all 500ms' }}>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: isLight ? '#F5F5F4' : '#1C1917', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '28px', padding: '48px', maxWidth: '480px', width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'rgba(202,138,4,0.1)', border: '2px solid #CA8A04', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
           </div>
-          <h1 className="m-0 text-2xl font-bold text-[#C8A25C]">Commande confirmée !</h1>
-          <p className="m-0 text-sm text-gray-600 dark:text-[#C8BEA8] leading-relaxed">
-            Votre commande <strong className="text-gray-900 dark:text-[#F2EDE2]">{orderNumber}</strong> a été reçue. Notre équipe vous contactera sous 24h.
+          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: '#CA8A04' }}>Commande confirmée !</h1>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: isLight ? '#44403C' : '#A8A29E', lineHeight: 1.7 }}>
+            Votre commande <strong style={{ color: isLight ? '#111827' : '#F2EDE2' }}>{orderNumber}</strong> a été reçue. Notre équipe vous contactera sous 24h.
           </p>
-          <p className="m-0 text-xs text-gray-500 dark:text-[#6B6654]">Paiement à la livraison (COD)</p>
-          <div className="flex flex-col gap-3 w-full">
+          <p style={{ margin: 0, fontSize: '0.75rem', color: isLight ? '#44403C' : '#A8A29E', fontWeight: 500 }}>Mode de paiement: Cash à la livraison</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', marginTop: '10px' }}>
             {whatsappUrl && (
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-gold text-center no-underline">
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', color: '#fff', padding: '14px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none', transition: 'transform 200ms ease' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
                 Confirmer sur WhatsApp
               </a>
             )}
-            <Link href={`/suivi?order=${orderNumber}`} className="text-xs text-[#C8A25C] hover:underline">
+            <Link href={`/suivi?order=${orderNumber}`} style={{ fontSize: '0.8rem', color: '#CA8A04', textDecoration: 'none', fontWeight: 600 }}>
               Suivre ma commande
             </Link>
-            <button onClick={() => router.push('/')} className="btn-gold mt-1 opacity-85">
+            <button onClick={() => router.push('/')} style={{ background: isLight ? '#111827' : '#F2EDE2', color: isLight ? '#FFFFFF' : '#0D0D0F', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', transition: 'opacity 200ms ease' }} onMouseOver={e => e.currentTarget.style.opacity = '0.8'} onMouseOut={e => e.currentTarget.style.opacity = '1'}>
               Retourner à la boutique
             </button>
           </div>
@@ -160,100 +168,116 @@ export default function CheckoutPage() {
   ] as const;
 
   return (
-    <main className="min-h-[100dvh] bg-[#FAFAFA] dark:bg-[#0D0D0F] pt-10 pb-20 px-6 transition-colors duration-500">
-      <div className="relative z-10 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <div className="bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-[#C8A25C]/20 rounded-3xl p-7 shadow-lg transition-colors duration-500">
-          <h2 className="m-0 mb-5 text-base font-bold text-gray-900 dark:text-[#F2EDE2] transition-colors">Votre commande</h2>
+    <main style={{ minHeight: '100dvh', background: isLight ? '#FFFFFF' : '#0D0D0F', padding: '40px 24px 80px', transition: 'all 500ms' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', alignItems: 'start' }}>
+        
+        {/* Order Summary */}
+        <div style={{ background: isLight ? '#F5F5F4' : '#1C1917', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '24px', padding: '28px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ margin: '0 0 24px', fontSize: '1rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>Votre commande</h2>
 
-          {items.length === 0 ? (
-            <p className="m-0 text-sm text-gray-500 dark:text-[#6B6654] text-center py-6">
-              Panier vide — <Link href="/catalogue" className="text-[#C8A25C] hover:underline">voir le catalogue</Link>
+          {!mounted ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '24px 0' }}>
+               <div style={{ height: '40px', background: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderRadius: '12px' }} />
+               <div style={{ height: '40px', background: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderRadius: '12px' }} />
+            </div>
+          ) : items.length === 0 ? (
+            <p style={{ margin: 0, fontSize: '0.85rem', color: isLight ? '#44403C' : '#A8A29E', textAlign: 'center', padding: '24px 0' }}>
+              Panier vide — <Link href="/catalogue" style={{ color: '#CA8A04', textDecoration: 'none', fontWeight: 600 }}>voir le catalogue</Link>
             </p>
           ) : (
             <>
-              <div className="flex flex-col gap-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {items.map((item) => (
-                  <div key={item.variantId} className="bg-gray-50 dark:bg-[#C8A25C]/5 border border-gray-100 dark:border-[#C8A25C]/10 rounded-xl p-3 px-4 flex justify-between items-center transition-colors">
+                  <div key={item.cartId} style={{ background: isLight ? '#FFFFFF' : '#0D0D0F', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '16px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <p className="m-0 text-sm font-semibold text-gray-800 dark:text-[#F2EDE2] transition-colors">{item.productName}</p>
-                      <p className="m-0 mt-0.5 text-[0.7rem] text-[#9B7A3D]">{item.variantName} × {item.quantity}</p>
+                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>{item.productName}</p>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.725rem', color: '#CA8A04', fontWeight: 600 }}>{item.variantName} × {item.quantity}</p>
                     </div>
-                    <span className="text-sm font-bold text-[#C8A25C]">{(item.price * item.quantity).toFixed(2)} MAD</span>
+                    <span style={{ fontSize: '0.9rem', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>{(item.price * item.quantity).toFixed(2)} dh</span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 flex flex-col gap-2">
+              <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {appliedPromo ? (
-                  <div className="flex justify-between items-center px-3 py-2.5 rounded-xl bg-green-50 border border-green-200 dark:bg-green-900/10 dark:border-green-500/30 transition-colors">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderRadius: '12px', background: 'rgba(21, 128, 61, 0.05)', border: '1px solid rgba(21, 128, 61, 0.1)' }}>
                     <div>
-                      <span className="text-xs font-bold text-green-600 dark:text-green-400">{appliedPromo.code}</span>
-                      <span className="text-[0.7rem] text-[#9B7A3D] ml-2">−{appliedPromo.label}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>{appliedPromo.code}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#15803d', marginLeft: '8px' }}>−{appliedPromo.label}</span>
                     </div>
-                    <button type="button" onClick={handleRemovePromo} className="bg-transparent border-none text-gray-500 dark:text-[#C8BEA8] text-[0.7rem] cursor-pointer hover:underline">Retirer</button>
+                    <button type="button" onClick={handleRemovePromo} style={{ background: 'transparent', border: 'none', color: isLight ? '#44403C' : '#A8A29E', fontSize: '0.7rem', cursor: 'pointer', textDecoration: 'underline' }}>Retirer</button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <input type="text" placeholder="Code promo" className="athar-input flex-1 uppercase" value={promoCode} onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); }} />
-                    <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'loading' || !promoCode.trim()} className="px-4 rounded-xl border border-[#C8A25C]/40 bg-[#C8A25C]/10 text-[#C8A25C] text-xs font-semibold cursor-pointer hover:bg-[#C8A25C]/20 transition-colors disabled:opacity-50">
-                      {promoStatus === 'loading' ? '...' : 'Appliquer'}
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input type="text" placeholder="Code promo" style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, background: isLight ? '#FFFFFF' : '#0D0D0F', color: isLight ? '#111827' : '#F2EDE2', outline: 'none', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }} value={promoCode} onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); }} />
+                    <button type="button" onClick={handleApplyPromo} disabled={promoStatus === 'loading' || !promoCode.trim()} style={{ padding: '0 20px', borderRadius: '12px', border: '1px solid #CA8A04', background: 'transparent', color: '#CA8A04', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', opacity: (promoStatus === 'loading' || !promoCode.trim()) ? 0.5 : 1 }}>
+                      {promoStatus === 'loading' ? '...' : 'Valider'}
                     </button>
                   </div>
                 )}
-                {promoError && <p className="m-0 text-[0.72rem] text-red-500 items-center">{promoError}</p>}
+                {promoError && <p style={{ margin: 0, fontSize: '0.7rem', color: '#ef4444', fontWeight: 500 }}>{promoError}</p>}
               </div>
 
-              <div className="mt-4 flex flex-col gap-1.5">
-                <div className="flex justify-between text-[0.78rem] text-gray-600 dark:text-[#C8BEA8] transition-colors">
-                  <span>Sous-total</span><span>{subtotal.toFixed(2)} MAD</span>
+              <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: isLight ? '#44403C' : '#A8A29E' }}>
+                  <span>Sous-total</span><span>{subtotal.toFixed(2)} dh</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-[0.78rem] text-green-600 dark:text-green-400 transition-colors">
-                    <span>Réduction</span><span>−{discount.toFixed(2)} MAD</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
+                    <span>Réduction</span><span>−{discount.toFixed(2)} dh</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[0.78rem] text-gray-600 dark:text-[#C8BEA8] transition-colors">
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: isLight ? '#44403C' : '#A8A29E' }}>
                   <span>Livraison</span>
-                  <span>{shipping === 0 ? 'Gratuite' : `${shipping.toFixed(2)} MAD`}</span>
+                  <span style={{ color: shipping === 0 ? '#16a34a' : 'inherit', fontWeight: shipping === 0 ? 600 : 'inherit' }}>{shipping === 0 ? 'Gratuite' : `${shipping.toFixed(2)} dh`}</span>
                 </div>
                 {shipping > 0 && (
-                  <p className="m-0 text-[0.68rem] text-[#9B7A3D]">
-                    Gratuite dès {siteConfig.shippingFreeThreshold} MAD
+                  <p style={{ margin: 0, fontSize: '0.65rem', color: '#CA8A04', fontWeight: 500 }}>
+                    Gratuite dès {siteConfig.shippingFreeThreshold} dh d&apos;achat
                   </p>
                 )}
-                <div className="mt-1 p-3.5 px-4 rounded-xl bg-gray-50 dark:bg-[#C8A25C]/10 border border-gray-200 dark:border-[#C8A25C]/20 flex justify-between items-center transition-colors">
-                  <span className="text-sm text-gray-700 dark:text-[#C8BEA8] font-medium transition-colors">Total</span>
-                  <span className="text-xl font-extrabold text-[#C8A25C]">{finalTotal.toFixed(2)} MAD</span>
+                <div style={{ marginTop: '8px', padding: '16px', borderRadius: '16px', background: isLight ? '#FFFFFF' : '#0D0D0F', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: isLight ? '#111827' : '#F2EDE2', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total</span>
+                  <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#CA8A04' }}>{finalTotal.toFixed(2)} dh</span>
                 </div>
               </div>
             </>
           )}
         </div>
 
-        <div className="bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-[#C8A25C]/20 rounded-3xl p-7 shadow-lg transition-colors duration-500">
-          <h2 className="m-0 mb-1.5 text-base font-bold text-gray-900 dark:text-[#F2EDE2] transition-colors">Livraison & coordonnées</h2>
-          <div className="w-9 h-0.5 bg-gradient-to-r from-[#C8A25C] to-transparent mb-5" />
+        {/* Shipping Form */}
+        <div style={{ background: isLight ? '#F5F5F4' : '#1C1917', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '24px', padding: '28px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ margin: '0 0 8px', fontSize: '1rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>Coordonnées de livraison</h2>
+          <div style={{ width: '40px', height: '2px', background: '#CA8A04', marginBottom: '28px' }} />
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {formFields.map(({ id, label, placeholder, type }) => (
               <div key={id}>
-                <label htmlFor={id} className="block text-[0.72rem] text-gray-600 dark:text-[#C8BEA8] mb-1.5 font-medium transition-colors">{label}</label>
-                <input id={id} type={type} required placeholder={placeholder} className="athar-input transition-colors duration-300" value={form[id as keyof typeof form]} onChange={(e) => setForm((f) => ({ ...f, [id]: e.target.value }))} />
+                <label htmlFor={id} style={{ display: 'block', fontSize: '0.725rem', color: isLight ? '#44403C' : '#A8A29E', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</label>
+                <input id={id} type={type} required placeholder={placeholder} style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, background: isLight ? '#FFFFFF' : '#0D0D0F', color: isLight ? '#111827' : '#F2EDE2', outline: 'none', fontSize: '0.85rem', transition: 'border-color 300ms ease' }} value={form[id as keyof typeof form]} onChange={(e) => setForm((f) => ({ ...f, [id]: e.target.value }))} />
               </div>
             ))}
 
             <AnimatePresence>
               {(status === 'error' || errorMsg) && (
-                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="m-0 text-sm text-red-500 text-center">{errorMsg}</motion.p>
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ margin: 0, fontSize: '0.8rem', color: '#ef4444', textAlign: 'center', fontWeight: 500 }}>{errorMsg}</motion.p>
               )}
             </AnimatePresence>
 
-            <div className="flex items-center justify-center gap-1.5">
-              <span className="text-[0.68rem] text-[#9B7A3D]">Paiement à la livraison — aucune carte requise</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '12px', background: 'rgba(202,138,4,0.05)', borderRadius: '12px', border: '1px solid rgba(202,138,4,0.1)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="2" />
+              </svg>
+              <span style={{ fontSize: '0.65rem', color: '#A16207', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Paiement à la livraison</span>
             </div>
 
-            <button type="submit" className="btn-gold disabled:opacity-40" disabled={status === 'loading' || items.length === 0}>
-              {status === 'loading' ? 'Traitement en cours...' : `Confirmer — ${finalTotal.toFixed(2)} MAD`}
+            <button type="submit" disabled={status === 'loading' || items.length === 0 || !mounted} style={{ width: '100%', background: '#CA8A04', color: '#fff', border: 'none', padding: '18px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', cursor: 'pointer', transition: 'all 300ms ease', boxShadow: '0 10px 25px rgba(202,138,4,0.25)', opacity: (status === 'loading' || items.length === 0 || !mounted) ? 0.4 : 1 }}>
+              {status === 'loading' 
+                ? 'Traitement...' 
+                : !mounted 
+                  ? 'Chargement...' 
+                  : `Confirmer — ${finalTotal.toFixed(2)} dh`
+              }
             </button>
           </form>
         </div>

@@ -22,6 +22,7 @@ Route::get('/shipping/config',      [ShippingController::class, 'config']);
 Route::post('/shipping/calculate',  [ShippingController::class, 'calculate']);
 Route::post('/promo/validate',      [PromoCodeController::class, 'validateCode']);
 Route::post('/orders',              [CheckoutController::class, 'store']);
+Route::post('/orders/abandoned',    [CheckoutController::class, 'abandoned']);
 Route::get('/orders/track',         [CheckoutController::class, 'track']);
 Route::post('/newsletter/subscribe',[NewsletterController::class, 'subscribe']);
 Route::get('/reviews/featured',     [ReviewController::class, 'featured']);

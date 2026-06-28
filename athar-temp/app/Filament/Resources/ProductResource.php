@@ -36,192 +36,257 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Catégorie')
-                    ->description('1) Femmes ou Hommes — 2) Type de parfum')
+                // 1. MASTER CLASSIFICATION
+                Forms\Components\Section::make('Classification & Status')
+                    ->description('Définissez le type de produit pour adapter le formulaire.')
                     ->schema([
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\Radio::make('collection_type')
+                                    ->label('Type de Collection')
+                                    ->options([
+                                        'standard' => 'Parfum Complet (Standard)',
+                                        'niche' => 'Parfum Niche (Luxe)',
+                                        'pack' => 'Pack / Coffret',
+                                    ])
+                                    ->default('standard')
+                                    ->descriptions([
+                                        'standard' => 'Produits classiques de la boutique.',
+                                        'niche' => 'Senteurs exclusives (Thème Obsidian).',
+                                        'pack' => 'Découverte ou Coffrets cadeaux.',
+                                    ])
+                                    ->required()
+                                    ->live()
+                                    ->afterStateHydrated(function (Set $set, $record) {
+                                        if ($record) {
+                                            if ($record->is_pack) $set('collection_type', 'pack');
+                                            elseif ($record->is_niche) $set('collection_type', 'niche');
+                                            else $set('collection_type', 'standard');
+                                        }
+                                    })
+                                    ->afterStateUpdated(function (Set $set, $state) {
+                                        $set('is_pack', $state === 'pack');
+                                        $set('is_niche', $state === 'niche');
+                                    })
+                                    ->columnSpan(2),
+
+                                Forms\Components\Grid::make(1)
+                                    ->schema([
+                                        Forms\Components\Toggle::make('is_active')
+                                            ->label('Visible sur le site')
+                                            ->default(true)
+                                            ->inline(false),
+
+                                        Forms\Components\Toggle::make('is_arabic')
+                                            ->label('🕌 Parfum Arabic')
+                                            ->helperText('Cocher pour afficher dans la section Parfums Arabic.')
+                                            ->default(false)
+                                            ->inline(false),
+                                    ])
+                                    ->columnSpan(1),
+                            ]),
+
+                        Forms\Components\Hidden::make('is_pack'),
+                        Forms\Components\Hidden::make('is_niche'),
+                    ]),
+
+                // 2. PACK CONFIGURATION
+                Forms\Components\Section::make('Configuration du Pack')
+                    ->description('Définissez si le client choisit ses parfums ou si le pack est pré-défini.')
+                    ->schema([
+                        Forms\Components\Radio::make('is_custom_pack')
+                            ->label('Type de Pack')
+                            ->options([
+                                true => 'Personnalisable (Le client choisit via le Box Builder)',
+                                false => 'Fixe (Contenu pré-déterminé)',
+                            ])
+                            ->default(true)
+                            ->live(),
+                            
+                        Forms\Components\TextInput::make('pack_slots')
+                            ->label('Nombre de parfums à choisir')
+                            ->helperText('Ex: Saisissez 10 pour un pack où le client doit choisir 10 parfums.')
+                            ->numeric()
+                            ->default(3)
+                            ->minValue(2)
+                            ->visible(fn (Get $get) => $get('is_custom_pack')),
+
+                        Forms\Components\Select::make('bundleProducts')
+                            ->label(fn (Get $get) => $get('is_custom_pack') ? 'Parfums disponibles au choix' : 'Produits inclus dans le pack')
+                            ->helperText(fn (Get $get) => $get('is_custom_pack') 
+                                ? 'Ces parfums apparaîtront dans le constructeur de coffret pour le client.'
+                                : 'Ces produits seront listés comme le contenu fixe de ce coffret.'
+                            )
+                            ->relationship('bundleProducts', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->required(fn (Get $get) => $get('collection_type') === 'pack')
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn (Get $get) => $get('collection_type') === 'pack')
+                    ->collapsible(),
+
+                // 3. CATEGORIZATION
+                Forms\Components\Section::make('Catégorisation')
+                    ->description('Cible et Type de parfum.')
+                    ->schema([
+                        Forms\Components\Radio::make('gender')
+                            ->label('Sexe (Persistant)')
+                            ->options([
+                                'homme' => 'Homme',
+                                'femme' => 'Femme',
+                                'unisex' => 'Unisex',
+                            ])
+                            ->required()
+                            ->default('unisex')
+                            ->columnSpanFull(),
+
                         Forms\Components\Select::make('gender_id')
-                            ->label('Femmes / Hommes')
+                            ->label('Univers (Filtrage)')
                             ->options(fn () => static::getGenderOptions())
                             ->live()
                             ->required()
                             ->dehydrated(false)
                             ->native(false)
-                            ->placeholder('Femmes ou Hommes...')
-                            ->afterStateUpdated(function (Set $set) {
+                            ->afterStateUpdated(function (Set $set, $state) {
                                 $set('category_id', null);
+                                if ($state) {
+                                    $gender = Category::find($state);
+                                    if ($gender) {
+                                        $set('gender', $gender->slug === 'hommes' ? 'homme' : ($gender->slug === 'femmes' ? 'femme' : 'unisex'));
+                                    }
+                                }
                             }),
 
                         Forms\Components\Select::make('category_id')
                             ->label('Type de parfum')
                             ->options(fn (Get $get) => static::getSubcategoryOptions($get('gender_id')))
-                            ->required()
+                            ->required(fn (Get $get) => $get('collection_type') !== 'pack' && !blank($get('gender_id')))
                             ->native(false)
                             ->searchable()
-                            ->placeholder('Eau de parfum, Eau de toilette...')
-                            ->hidden(fn (Get $get) => blank($get('gender_id')))
-                            ->key(fn (Get $get) => 'category-' . ($get('gender_id') ?? 'none'))
-                            ->helperText(fn (Get $get) => blank($get('gender_id'))
-                                ? 'Choisissez d\'abord Femmes ou Hommes'
-                                : 'Cliquez sur + pour ajouter un nouveau type')
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
-                                    ->label('Nom du type')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('Ex: Brume parfumée'),
-                            ])
-                            ->createOptionUsing(function (array $data, Get $get): int {
-                                return static::createSubcategory((int) $get('gender_id'), $data['name']);
-                            })
-                            ->createOptionAction(fn (Forms\Components\Actions\Action $action) => $action
-                                ->modalHeading('Ajouter un type de parfum')
-                                ->modalSubmitActionLabel('Créer')
-                                ->icon('heroicon-m-plus')),
+                            ->hidden(fn (Get $get) => $get('collection_type') === 'pack' || blank($get('gender_id')))
                     ])
                     ->columns(2),
 
-                Forms\Components\Select::make('brand')
-                    ->label('Marque')
-                    ->searchable()
-                    ->required()
-                    ->native(false)
-                    ->options(fn () => static::getBrandOptions())
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nom de la marque')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Ex: Dior, Tom Ford...'),
-                    ])
-                    ->createOptionUsing(function (array $data): string {
-                        $brand = Brand::firstOrCreate(
-                            ['slug' => Str::slug($data['name'])],
-                            ['name' => $data['name'], 'is_active' => true],
-                        );
-
-                        return $brand->name;
-                    })
-                    ->createOptionAction(fn (Forms\Components\Actions\Action $action) => $action
-                        ->modalHeading('Nouvelle marque')
-                        ->modalSubmitActionLabel('Ajouter')
-                        ->icon('heroicon-m-plus')),
-
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
-
-                Forms\Components\Section::make('SEO')
-                    ->description('Référencement Google et réseaux sociaux')
+                // 4. GENERAL INFO
+                Forms\Components\Section::make('Informations Générales')
                     ->schema([
-                        Forms\Components\TextInput::make('meta_title')
-                            ->label('Titre SEO')
-                            ->maxLength(70)
-                            ->placeholder(fn (?Product $record) => $record?->name)
-                            ->helperText('Max 70 caractères — laissez vide pour utiliser le nom du produit'),
-
-                        Forms\Components\Textarea::make('meta_description')
-                            ->label('Description SEO')
-                            ->maxLength(160)
-                            ->rows(3)
-                            ->placeholder(fn (?Product $record) => $record?->description)
-                            ->helperText('Max 160 caractères'),
-                    ])
-                    ->columns(1)
-                    ->collapsible()
-                    ->collapsed(),
-
-                Forms\Components\Toggle::make('is_pack')
-                    ->label('Est un pack')
-                    ->default(false),
-                Forms\Components\Toggle::make('is_active')
-                    ->default(true)
-                    ->required(),
-                Forms\Components\FileUpload::make('image')
-                    ->label('Image principale (WEBP)')
-                    ->image()
-                    ->acceptedFileTypes(['image/webp'])
-                    ->directory('products')
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('gallery')
-                    ->label('Galerie d\'images (WEBP)')
-                    ->multiple()
-                    ->image()
-                    ->reorderable()
-                    ->acceptedFileTypes(['image/webp'])
-                    ->directory('products/gallery')
-                    ->columnSpanFull(),
-                Forms\Components\Repeater::make('variants')
-                    ->relationship()
-                    ->schema([
-                        Forms\Components\Select::make('size')
-                            ->label('Contenance')
-                            ->searchable()
-                            ->required()
-                            ->native(false)
-                            ->options(fn () => static::getContenanceOptions())
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('size')
-                                    ->label('Contenance')
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nom du produit')
                                     ->required()
-                                    ->placeholder('Ex: 75ml'),
-                            ])
-                            ->createOptionUsing(fn (array $data): string => $data['size']),
-                        Forms\Components\TextInput::make('price')
-                            ->label('Prix Actuel (MAD)')
-                            ->required()
-                            ->numeric()
-                            ->prefix('MAD'),
-                        Forms\Components\TextInput::make('compare_at_price')
-                            ->label('Prix Barré (Original) MAD')
-                            ->numeric()
-                            ->prefix('MAD')
-                            ->placeholder('Ex: 1500 (laissez vide si pas de promo)'),
-                        Forms\Components\TextInput::make('sku')
-                            ->label('SKU (Généré Auto)')
-                            ->default(fn () => 'ATH-' . strtoupper(Str::random(6)))
-                            ->required()
-                            ->unique('product_variants', 'sku', ignoreRecord: true)
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('stock')
-                            ->label('Stock Dispo')
-                            ->required()
-                            ->numeric()
-                            ->default(0),
-                    ])
-                    ->columns(4)
-                    ->columnSpanFull()
-                    ->itemLabel(fn (array $state): ?string => $state['size'] ?? null),
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                                
+                                Forms\Components\TextInput::make('slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true),
 
-                Forms\Components\Section::make('Marketing & Recommandations')
-                    ->description('Curation manuelle des produits recommandés en bas de page.')
-                    ->schema([
-                        Forms\Components\Select::make('relatedProducts')
-                            ->relationship('relatedProducts', 'name')
-                            ->multiple()
-                            ->searchable()
-                            ->placeholder('Choisissez les parfums à recommander...')
-                            ->preload()
+                                Forms\Components\Select::make('brand')
+                                    ->label('Marque')
+                                    ->searchable()
+                                    ->required()
+                                    ->native(false)
+                                    ->options(fn () => static::getBrandOptions())
+                                    ->columnSpan(2)
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')->required(),
+                                    ])
+                                    ->createOptionUsing(fn (array $data) => Brand::firstOrCreate(['slug' => Str::slug($data['name'])], ['name' => $data['name'], 'is_active' => true])->name)
+                                    ->createOptionAction(fn ($action) => $action->modalHeading('Nouvelle marque')->icon('heroicon-m-plus')),
+                            ]),
+
+                        Forms\Components\Textarea::make('description')
+                            ->label('Description')
+                            ->required()
+                            ->rows(4)
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('badge_label')
-                            ->label('Texte du Badge Promo (ex: "FREE SHIPPING" ou "-20%")')
-                            ->maxLength(255)
-                            ->placeholder('Laissez vide pour cacher le badge'),
-                        Forms\Components\ColorPicker::make('badge_color')
-                            ->label('Couleur du Badge (Optionnel)')
-                            ->default('#C8A25C'),
+                    ]),
+
+                // 5. MEDIA
+                Forms\Components\Section::make('Images & Galerie')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Image principale')
+                            ->image()
+                            ->imageEditor()
+                            ->imageResizeTargetWidth('1000')
+                            ->imageResizeTargetHeight('1000')
+                            ->disk('public')
+                            ->acceptedFileTypes(['image/webp', 'image/jpeg', 'image/png'])
+                            ->directory('products')
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('gallery')
+                            ->label('Galerie')
+                            ->multiple()
+                            ->image()
+                            ->imageEditor()
+                            ->imageResizeTargetWidth('1000')
+                            ->imageResizeTargetHeight('1000')
+                            ->disk('public')
+                            ->reorderable()
+                            ->directory('products/gallery')
+                            ->columnSpanFull(),
                     ])
                     ->collapsible(),
+
+                // 6. VARIANTS
+                Forms\Components\Section::make('Contenance & Prix')
+                    ->schema([
+                        Forms\Components\Repeater::make('variants')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('size')
+                                    ->label('Taille')
+                                    ->options(fn () => static::getContenanceOptions())
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\TextInput::make('price')
+                                    ->label('Prix (MAD)')
+                                    ->numeric()
+                                    ->required(),
+                                Forms\Components\TextInput::make('compare_at_price')
+                                    ->label('Ancien Prix')
+                                    ->numeric(),
+                                Forms\Components\TextInput::make('sku')
+                                    ->label('SKU')
+                                    ->default(fn () => 'ATH-' . strtoupper(Str::random(6)))
+                                    ->required(),
+                                Forms\Components\TextInput::make('stock')
+                                    ->label('Stock')
+                                    ->numeric()
+                                    ->default(100)
+                                    ->required(),
+                            ])
+                            ->columns(5),
+                    ]),
+
+                // 7. MARKETING & SEO
+                Forms\Components\Tabs::make('Plus de détails')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Recommandations')
+                            ->schema([
+                                Forms\Components\Select::make('relatedProducts')
+                                    ->relationship('relatedProducts', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload(),
+                                Forms\Components\TextInput::make('badge_label')
+                                    ->label('Badge Promo'),
+                                Forms\Components\ColorPicker::make('badge_color')
+                                    ->label('Couleur du Badge'),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('SEO')
+                            ->schema([
+                                Forms\Components\TextInput::make('meta_title'),
+                                Forms\Components\Textarea::make('meta_description'),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -244,8 +309,21 @@ class ProductResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_pack')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('collection_label')
+                    ->label('Collection')
+                    ->badge()
+                    ->getStateUsing(function (Product $record) {
+                        if ($record->is_pack) {
+                            return $record->is_custom_pack ? 'Pack (Custom)' : 'Pack (Fixe)';
+                        }
+                        if ($record->is_niche) return 'Niche';
+                        return 'Standard';
+                    })
+                    ->color(fn ($state) => match(true) {
+                        str_contains($state, 'Pack') => 'info',
+                        $state === 'Niche' => 'gray',
+                        default => 'success',
+                    }),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('variants_sum_stock')
@@ -415,7 +493,9 @@ class ProductResource extends Resource
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        return parent::getEloquentQuery()->withSum('variants', 'stock');
+        return parent::getEloquentQuery()
+            ->with(['category.parent.parent'])
+            ->withSum('variants', 'stock');
     }
 
     public static function duplicateProduct(Product $product): Product

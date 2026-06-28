@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Product, ProductVariant, bottleColors, PerfumeBottle } from './page';
+import { Product, ProductVariant } from './page';
 import CheckoutForm from './CheckoutForm';
 
-/* ── Types ─────────────────────────────────────────────────── */
 export interface CartItem {
   variant: ProductVariant;
   productName: string;
@@ -17,48 +16,45 @@ interface ProductCardProps {
   cart: CartItem[];
 }
 
-/* ── ProductCard Component ───────────────────────────────────── */
-function ProductCard({ product, onAddToCart, cart }: ProductCardProps) {
+function StoreProductCard({ product, onAddToCart, cart }: ProductCardProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.variants[0]);
-  const color = bottleColors[product.slug] ?? '#C8A25C';
-
   const isInCart = cart.some(item => item.variant.id === selectedVariant.id);
+  const mainImage = product.image_url;
 
   return (
-    <article className="glass-card fade-up" style={{ padding: '24px 28px', display: 'flex', gap: 24, alignItems: 'center' }}>
-      {/* Bottle illustration */}
-      <div style={{ flexShrink: 0 }}>
-        <PerfumeBottle color={color} />
+    <article style={{ 
+      display: 'flex', 
+      gap: 24, 
+      alignItems: 'center', 
+      padding: '24px', 
+      background: '#FFFFFF',
+      border: '1px solid #EAEAEA',
+      marginBottom: 16
+    }}>
+      <div style={{ flexShrink: 0, width: 80, height: 100, background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {mainImage ? (
+           <img src={mainImage} alt={product.name} style={{ width: '80%', height: '80%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        ) : (
+           <div style={{ width: 40, height: 60, background: '#EAEAEA' }} />
+        )}
       </div>
       
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <h2 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: 700, color: '#F2EDE2' }}>{product.name}</h2>
-          <span style={{ fontSize: '0.7rem', color: '#C8A25C', fontWeight: 600, background: 'rgba(200,162,92,0.1)', padding: '2px 8px', borderRadius: 20 }}>
-            {product.category?.name}
-          </span>
-        </div>
+        <h2 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 500, color: '#111111', textTransform: 'uppercase' }}>{product.name}</h2>
+        <p style={{ margin: '0 0 12px', fontSize: '0.8rem', color: '#666666' }}>{product.category?.name}</p>
         
-        <div className="gold-divider" />
-        <p style={{ margin: '8px 0 12px', fontSize: '0.8rem', color: '#C8BEA8', lineHeight: 1.6 }}>{product.description}</p>
-        
-        {/* Variant Toggles */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           {product.variants.map((v) => (
             <button
               key={v.id}
               onClick={() => setSelectedVariant(v)}
               style={{
-                padding: '4px 12px',
-                borderRadius: 8,
+                padding: '6px 12px',
                 fontSize: '0.75rem',
-                fontWeight: 600,
                 border: '1px solid',
-                borderColor: selectedVariant.id === v.id ? '#C8A25C' : 'rgba(200,162,92,0.2)',
-                background: selectedVariant.id === v.id ? '#C8A25C' : 'transparent',
-                color: selectedVariant.id === v.id ? '#1A1A1D' : '#C8BEA8',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderColor: selectedVariant.id === v.id ? '#111111' : '#EAEAEA',
+                background: selectedVariant.id === v.id ? '#111111' : '#FFFFFF',
+                color: selectedVariant.id === v.id ? '#FFFFFF' : '#111111',
                 cursor: 'pointer'
               }}
             >
@@ -68,20 +64,25 @@ function ProductCard({ product, onAddToCart, cart }: ProductCardProps) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#C8A25C', transition: 'all 0.2s' }}>
-              {selectedVariant.price}
-            </span>
-            <span style={{ fontSize: '0.75rem', color: '#9B7A3D', fontWeight: 500 }}>MAD</span>
+          <div style={{ fontSize: '1.1rem', fontWeight: 500, color: '#111111' }}>
+            {selectedVariant.price} <span style={{ fontSize: '0.75rem' }}>MAD</span>
           </div>
           
           <button 
             onClick={() => onAddToCart(selectedVariant, product.name)}
             disabled={isInCart}
-            className={isInCart ? "btn-secondary" : "btn-gold-sm"}
-            style={{ padding: '8px 16px', fontSize: '0.75rem', height: 'auto' }}
+            style={{ 
+              padding: '10px 16px', 
+              fontSize: '0.75rem', 
+              background: isInCart ? '#F5F5F5' : '#111111',
+              color: isInCart ? '#999999' : '#FFFFFF',
+              border: 'none',
+              cursor: isInCart ? 'default' : 'pointer',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
           >
-            {isInCart ? 'Dans le panier' : 'Ajouter +'}
+            {isInCart ? 'Ajouté' : 'Ajouter'}
           </button>
         </div>
       </div>
@@ -89,7 +90,6 @@ function ProductCard({ product, onAddToCart, cart }: ProductCardProps) {
   );
 }
 
-/* ── Storefront Main Component ───────────────────────────────── */
 export default function Storefront({ products }: { products: Product[] }) {
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -110,51 +110,32 @@ export default function Storefront({ products }: { products: Product[] }) {
 
   return (
     <div style={{
+      maxWidth: 1200,
+      margin: '0 auto',
+      padding: '40px 24px',
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
-      gap: 32,
+      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 450px), 1fr))',
+      gap: 40,
       alignItems: 'start',
+      background: '#F8F8F8',
+      minHeight: '100vh',
     }}>
-      {/* ── LEFT — Cinematic product display ─────────── */}
-      <section aria-label="Nos parfums">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {products.length === 0 && (
-            <div className="glass-card fade-up" style={{ padding: 32, textAlign: 'center' }}>
-              <p style={{ color: '#6B6654', fontSize: '0.875rem' }}>Produits indisponibles — veuillez relancer le serveur Laravel.</p>
-            </div>
-          )}
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} cart={cart} onAddToCart={handleAddToCart} />
-          ))}
-        </div>
-
-        {/* Trust pillars */}
-        <div className="fade-up" style={{ marginTop: 28, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          {[
-            { icon: 'M5 13l4 4L19 7', label: '100% Authentique' },
-            { icon: 'M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9', label: 'Livraison au Maroc' },
-            { icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z', label: 'Paiement COD' },
-          ].map(({ icon, label }) => (
-            <div key={label} style={{ textAlign: 'center', padding: '14px 8px', borderRadius: 12, background: 'rgba(200,162,92,0.04)', border: '1px solid rgba(200,162,92,0.1)' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A25C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px' }}>
-                <path d={icon} />
-              </svg>
-              <p style={{ margin: 0, fontSize: '0.65rem', fontWeight: 600, color: '#C8BEA8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</p>
-            </div>
-          ))}
-        </div>
+      <section>
+        {products.length === 0 && (
+          <div style={{ padding: 32, textAlign: 'center', background: '#FFFFFF', border: '1px solid #EAEAEA' }}>
+            <p style={{ color: '#666666', fontSize: '0.9rem' }}>Aucun produit disponible.</p>
+          </div>
+        )}
+        {products.map((p) => (
+          <StoreProductCard key={p.id} product={p} cart={cart} onAddToCart={handleAddToCart} />
+        ))}
       </section>
 
-      {/* ── RIGHT — Checkout form ─────────────────────── */}
-      <section aria-label="Passer votre commande">
-        <div className="glass-card fade-up" style={{ padding: '32px 28px', animationDelay: '0.15s' }}>
-          <div style={{ marginBottom: 24 }}>
-            <h2 style={{ margin: '0 0 6px 0', fontSize: '1.15rem', fontWeight: 700, color: '#F2EDE2' }}>Passer votre commande</h2>
-            <div className="gold-divider" />
-            <p style={{ margin: '8px 0 0', fontSize: '0.8rem', color: '#C8BEA8', lineHeight: 1.6 }}>
-              Sélectionnez vos parfums, renseignez vos coordonnées et confirmez. Paiement à la livraison.
-            </p>
-          </div>
+      <section>
+        <div style={{ padding: '32px', background: '#FFFFFF', border: '1px solid #EAEAEA' }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: '1.25rem', fontWeight: 500, color: '#111111', textTransform: 'uppercase' }}>
+            Finaliser la commande
+          </h2>
           <CheckoutForm cart={cart} updateQty={updateQty} onOrderSuccess={() => setCart([])} />
         </div>
       </section>

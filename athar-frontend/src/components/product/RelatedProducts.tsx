@@ -1,89 +1,180 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { Product, ProductVariant } from '@/app/page';
+import useCartStore from '@/store/cartStore';
+import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
-import { Product } from '@/app/page';
-import ProductCard from '@/components/ui/ProductCard';
 
 interface RelatedProductsProps {
   products: Product[];
 }
 
-export default function RelatedProducts({ products }: RelatedProductsProps) {
-  const [mounted, setMounted] = useState(false);
+function MiniProductCard({ product }: { product: Product }) {
+  const router = useRouter();
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
+  
+  useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => setMounted(true), []);
+  const [selected] = useState<ProductVariant>(product.variants[0]);
+  const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!selected) return;
+    addItem({
+      variantId: selected.id,
+      sku: selected.sku,
+      productName: product.name,
+      variantName: selected.size,
+      price: parseFloat(selected.price),
+      slug: product.slug,
+      imageUrl: product.image_url,
+      quantity: 1,
+    } as any);
+    openCart();
+  };
+
+  return (
+    <div 
+      onClick={() => router.push(`/products/${product.slug}`)}
+      style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', background: 'transparent' }}
+    >
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '1 / 1',
+        background: isLight ? '#F5F5F4' : '#1C1917',
+        overflow: 'hidden',
+        borderRadius: '8px',
+        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)'}`
+      }}>
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+              transition: 'transform 500ms ease',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', background: isLight ? '#F5F5F4' : '#1C1917' }} />
+        )}
+        <button
+          onClick={handleAdd}
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            width: 32,
+            height: 32,
+            borderRadius: 4,
+            background: isLight ? '#FFFFFF' : '#0D0D0F',
+            border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`,
+            fontSize: '1.2rem',
+            fontWeight: 300,
+            color: isLight ? '#111827' : '#F2EDE2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            zIndex: 1,
+            cursor: 'pointer'
+          }}
+        >
+          +
+        </button>
+      </div>
+
+      <div style={{ padding: '12px 2px', textAlign: 'center' }}>
+        <h3 style={{
+          margin: '0 0 4px',
+          fontSize: '0.8rem',
+          fontWeight: 400,
+          color: isLight ? '#111827' : '#F2EDE2',
+          textTransform: 'capitalize',
+          letterSpacing: '0.02em',
+        }}>
+          {product.name}
+        </h3>
+        <p style={{
+          margin: 0,
+          fontSize: '0.8rem',
+          color: isLight ? '#44403C' : '#A8A29E',
+          fontWeight: 600,
+        }}>
+          {selected ? `${parseFloat(selected.price).toFixed(2)} dh` : ''}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function RelatedProducts({ products }: RelatedProductsProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const isLight = mounted && resolvedTheme === 'light';
+  
+  useEffect(() => { setMounted(true); }, []);
 
   if (!products || products.length === 0) return null;
 
   return (
-    <section 
-      style={{ 
-        padding: '80px 24px',
-        maxWidth: 1400,
-        margin: '0 auto',
-      }}
-    >
+    <section style={{ padding: '80px 0', borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, background: isLight ? '#FAFAFA' : '#0D0D0F', transition: 'background 300ms ease' }}>
+      
+      <style>{`
+        .related-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px 15px;
+          padding: 0 15px;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+        @media (min-width: 1024px) {
+          .related-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px 25px;
+            padding: 0 40px;
+          }
+        }
+      `}</style>
+
       <div style={{ marginBottom: 40, textAlign: 'center' }}>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          style={{ 
-            fontSize: '0.65rem', 
-            fontWeight: 700, 
-            letterSpacing: '0.4em', 
-            color: '#C8A25C', 
-            textTransform: 'uppercase',
-            marginBottom: 12
-          }}
-        >
-          Découverte
-          </motion.p>
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          style={{ 
-            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', 
-            fontWeight: 800, 
-            color: isLight ? '#111827' : '#F2EDE2',
-            margin: 0,
-            letterSpacing: '-0.02em'
-          }}
-        >
+        <p style={{ 
+          fontSize: '0.6rem', 
+          fontWeight: 700, 
+          letterSpacing: '0.4em', 
+          color: '#CA8A04', 
+          textTransform: 'uppercase',
+          marginBottom: 12
+        }}>
+          Recommandations
+        </p>
+        <h2 style={{ 
+          fontSize: '1.8rem', 
+          fontWeight: 400, 
+          color: isLight ? '#111827' : '#F2EDE2',
+          margin: 0,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          fontFamily: 'var(--font-display, serif)'
+        }}>
           Vous aimerez aussi
-        </motion.h2>
-        <div style={{ 
-          width: 60, 
-          height: 3, 
-          background: '#C8A25C', 
-          margin: '20px auto 0',
-          borderRadius: 2
-        }} />
+        </h2>
       </div>
 
-      <div 
-        style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: 32 
-        }}
-      >
-        {products.map((product, idx) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: idx * 0.1 }}
-          >
-            <ProductCard product={product} />
-          </motion.div>
+      <div className="related-grid">
+        {products.slice(0, 4).map((product) => (
+          <MiniProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>

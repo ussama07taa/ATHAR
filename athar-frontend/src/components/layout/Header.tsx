@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from 'next-themes';
 import useCartStore from '@/store/cartStore';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import { usePathname } from 'next/navigation';
 import ParfumsMegaMenu from '@/components/layout/ParfumsMegaMenu';
 import { MenuCategory } from '@/types/catalog';
+import { useTheme } from 'next-themes';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import Image from 'next/image';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
@@ -17,24 +18,26 @@ const navLinks = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export default function Header() {
+export default function Header({ initialMenuData }: { initialMenuData?: MenuCategory | null }) {
+  const { resolvedTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const isLight = mounted && resolvedTheme === 'light';
+  
   const totalItems = useCartStore((s) => s.totalItems());
   const openCart = useCartStore((s) => s.openCart);
-  const { resolvedTheme } = useTheme();
   const pathname = usePathname();
   
-  const isLight = mounted && resolvedTheme === 'light';
-
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [parfumsMenu, setParfumsMenu] = useState<MenuCategory | null>(null);
+  const [parfumsMenu, setParfumsMenu] = useState<MenuCategory | null>(initialMenuData ?? null);
   const [isParfumsOpen, setIsParfumsOpen] = useState(false);
-
+ 
   useEffect(() => {
+    if (parfumsMenu) return; // Skip if already have data from server
+    
     fetch('/api/collections?menu=true')
       .then((res) => res.json())
       .then((data: MenuCategory[]) => {
@@ -42,7 +45,7 @@ export default function Header() {
         if (parfums) setParfumsMenu(parfums);
       })
       .catch(() => {});
-  }, []);
+  }, [parfumsMenu]);
 
   useEffect(() => {
     if (isSearchOpen && allProducts.length === 0) {
@@ -82,12 +85,14 @@ export default function Header() {
         right: 0,
         zIndex: 100,
         background: scrolled 
-          ? (isLight ? 'rgba(255,255,255,0.92)' : 'rgba(13,13,15,0.92)')
+          ? (isLight ? 'rgba(255,255,255,0.9)' : 'rgba(13,13,15,0.8)') 
           : 'transparent',
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? `1px solid ${isLight ? 'rgba(200,162,92,0.15)' : 'rgba(200,162,92,0.1)'}` : 'none',
-        transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+        borderBottom: scrolled 
+          ? `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` 
+          : 'none',
+        transition: 'all 500ms cubic-bezier(0.23, 1, 0.32, 1)',
       }}
     >
       {/* Top Row: Search, Logo, Cart/Theme */}
@@ -102,7 +107,7 @@ export default function Header() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Mobile Menu Toggle - This will now need to trigger a global state or I use a simple window event */}
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-mobile-menu'))}
             className="mobile-only"
@@ -139,12 +144,12 @@ export default function Header() {
           
           {mounted && (
             <div className="desktop-only" style={{ gap: 12, marginLeft: 8 }}>
-              <a href="https://instagram.com/athar" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.6, transition: 'opacity 200ms' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              </a>
-              <a href="https://tiktok.com/@athar" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.6, transition: 'opacity 200ms' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
-              </a>
+               <a href="https://www.instagram.com/atha_rfragrances/" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.6, transition: 'opacity 200ms' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}>
+                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+               </a>
+               <a href="https://www.tiktok.com/@atha_rfragrances?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" style={{ color: isLight ? '#111827' : '#F2EDE2', opacity: 0.6, transition: 'opacity 200ms' }} onMouseEnter={e => e.currentTarget.style.opacity = '1'} onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}>
+                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
+               </a>
             </div>
           )}
         </div>
@@ -157,30 +162,31 @@ export default function Header() {
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
             <span style={{
-              fontSize: '1.75rem',
-              fontWeight: 800,
-              color: '#C8A25C',
-              letterSpacing: '0.2em',
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.9rem',
+              fontWeight: 700,
+              color: '#CA8A04',
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
               lineHeight: 0.9
             }}>
               Athar
             </span>
             <span style={{
-              fontSize: '0.6rem',
-              fontWeight: 400,
-              color: '#9B7A3D',
-              letterSpacing: '0.35em',
+              fontSize: '0.55rem',
+              fontWeight: 500,
+              color: '#A16207',
+              letterSpacing: '0.4em',
               textTransform: 'uppercase',
-              marginTop: 4
+              marginTop: 6
             }}>
               Maison de Parfums
             </span>
           </motion.div>
         </Link>
 
-        {/* Cart & Theme */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
+        {/* Right side: Theme + Cart */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
           <ThemeToggle />
           
           <button
@@ -201,7 +207,7 @@ export default function Header() {
               <path d="M16 10a4 4 0 01-8 0" />
             </svg>
             <AnimatePresence>
-              {totalItems > 0 && (
+              {mounted && totalItems > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -213,14 +219,15 @@ export default function Header() {
                     minWidth: 16,
                     height: 16,
                     borderRadius: 8,
-                    background: '#C8A25C',
-                    color: '#0D0D0F',
+                    background: '#CA8A04',
+                    color: '#FFFFFF',
                     fontSize: '0.6rem',
                     fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '0 4px'
+                    padding: '0 4px',
+                    boxShadow: '0 2px 8px rgba(202,138,4,0.3)'
                   }}
                 >
                   {totalItems}
@@ -244,20 +251,83 @@ export default function Header() {
         <Link
           href="/"
           style={{
-            fontSize: '0.85rem',
+            fontSize: '0.8rem',
             fontWeight: 600,
-            color: pathname === '/' ? '#C8A25C' : (isLight ? '#4B5563' : '#C8BEA8'),
+            color: pathname === '/' ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
             textDecoration: 'none',
-            letterSpacing: '0.08em',
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            transition: 'all 250ms ease',
+            transition: 'all 300ms ease',
             position: 'relative',
             padding: '4px 0',
           }}
         >
           Accueil
           {pathname === '/' && (
-            <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: '#C8A25C', borderRadius: 1 }} />
+            <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
+          )}
+        </Link>
+
+        {/* Niche (NEW) */}
+        <Link
+          href="/niche"
+          style={{
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            color: pathname === '/niche' ? '#CA8A04' : '#A16207',
+            textDecoration: 'none',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            transition: 'all 300ms ease',
+            position: 'relative',
+            padding: '4px 0',
+          }}
+        >
+          Niche
+          {pathname === '/niche' && (
+            <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
+          )}
+        </Link>
+
+        {/* Packs (NEW) */}
+        <Link
+          href="/packs"
+          style={{
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            color: pathname === '/packs' ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
+            textDecoration: 'none',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            transition: 'all 300ms ease',
+            position: 'relative',
+            padding: '4px 0',
+          }}
+        >
+          Packs
+          {pathname === '/packs' && (
+            <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
+          )}
+        </Link>
+
+        {/* Parfums Arabic */}
+        <Link
+          href="/parfums-arabic"
+          style={{
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            color: pathname === '/parfums-arabic' ? '#CA8A04' : '#A16207',
+            textDecoration: 'none',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            transition: 'all 300ms ease',
+            position: 'relative',
+            padding: '4px 0',
+          }}
+        >
+          Arabic
+          {pathname === '/parfums-arabic' && (
+            <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
           )}
         </Link>
 
@@ -271,13 +341,13 @@ export default function Header() {
             <Link
               href="/catalogue?category=parfums"
               style={{
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 fontWeight: 600,
-                color: pathname.startsWith('/catalogue') ? '#C8A25C' : (isLight ? '#4B5563' : '#C8BEA8'),
+                color: pathname.startsWith('/catalogue') ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
                 textDecoration: 'none',
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                transition: 'all 250ms ease',
+                transition: 'all 300ms ease',
                 position: 'relative',
                 padding: '4px 0',
                 display: 'flex',
@@ -290,7 +360,7 @@ export default function Header() {
                 <polyline points="6 9 12 15 18 9" />
               </svg>
               {pathname.startsWith('/catalogue') && (
-                <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: '#C8A25C', borderRadius: 1 }} />
+                <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
               )}
             </Link>
             <AnimatePresence>
@@ -319,13 +389,13 @@ export default function Header() {
               key={href}
               href={href}
               style={{
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 fontWeight: 600,
-                color: isActive ? '#C8A25C' : (isLight ? '#4B5563' : '#C8BEA8'),
+                color: isActive ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
                 textDecoration: 'none',
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                transition: 'all 250ms ease',
+                transition: 'all 300ms ease',
                 position: 'relative',
                 padding: '4px 0'
               }}
@@ -339,8 +409,8 @@ export default function Header() {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: 2,
-                    background: '#C8A25C',
+                    height: 1.5,
+                    background: '#CA8A04',
                     borderRadius: 1
                   }}
                 />
@@ -360,7 +430,7 @@ export default function Header() {
             style={{
               position: 'fixed',
               inset: 0,
-              background: isLight ? 'rgba(255,255,255,0.98)' : 'rgba(13,13,15,0.98)',
+              background: isLight ? '#FFFFFF' : '#0C0A09',
               zIndex: 1000,
               display: 'flex',
               flexDirection: 'column',
@@ -395,7 +465,7 @@ export default function Header() {
                   width: '100%',
                   background: 'none',
                   border: 'none',
-                  borderBottom: `2px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(200,162,92,0.3)'}`,
+                  borderBottom: `2px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`,
                   padding: '16px 0',
                   fontSize: '2rem',
                   fontWeight: 600,
@@ -408,33 +478,33 @@ export default function Header() {
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map(p => (
                     <Link 
-                      key={p.id} 
-                      href={`/products/${p.slug}`}
-                      onClick={() => setIsSearchOpen(false)}
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 20, 
-                        padding: '12px 20px', 
-                        borderRadius: 16,
-                        background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(200,162,92,0.05)',
-                        textDecoration: 'none',
-                        transition: 'transform 200ms ease'
-                      }}
+                       key={p.id} 
+                       href={`/products/${p.slug}`}
+                       onClick={() => setIsSearchOpen(false)}
+                       style={{ 
+                         display: 'flex', 
+                         alignItems: 'center', 
+                         gap: 20, 
+                         padding: '12px 20px', 
+                         borderRadius: 16,
+                         background: isLight ? '#FAFAFA' : '#1C1917',
+                         textDecoration: 'none',
+                         transition: 'transform 200ms ease'
+                       }}
                     >
-                      <div style={{ width: 50, height: 50, borderRadius: 8, background: '#C8A25C22', flexShrink: 0 }}>
-                        {p.image_url && <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />}
+                      <div style={{ width: 50, height: 50, borderRadius: 8, background: '#C8A25C22', flexShrink: 0, position: 'relative', overflow: 'hidden' }}>
+                        {p.image_url && <Image src={p.image_url} alt={p.name} fill sizes="50px" style={{ objectFit: 'cover' }} />}
                       </div>
                       <div>
                         <p style={{ margin: 0, fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>{p.name}</p>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#9B7A3D' }}>{p.variants?.[0]?.price} MAD</p>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#CA8A04' }}>{p.variants?.[0]?.price} MAD</p>
                       </div>
                     </Link>
                   ))
                 ) : searchQuery.trim() !== '' ? (
-                  <p style={{ color: '#6B6654', textAlign: 'center' }}>Aucun résultat pour &quot;{searchQuery}&quot;</p>
+                  <p style={{ color: isLight ? '#44403C' : '#A8A29E', textAlign: 'center' }}>Aucun résultat pour &quot;{searchQuery}&quot;</p>
                 ) : (
-                  <p style={{ color: '#6B6654', textAlign: 'center', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  <p style={{ color: isLight ? '#44403C' : '#A8A29E', textAlign: 'center', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                     Saisissez un nom de parfum...
                   </p>
                 )}
@@ -444,6 +514,5 @@ export default function Header() {
         )}
       </AnimatePresence>
     </header>
-
   );
 }

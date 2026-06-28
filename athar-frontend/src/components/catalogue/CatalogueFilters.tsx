@@ -8,43 +8,76 @@ interface FilterSectionProps {
   title: string;
   defaultOpen?: boolean;
   activeCount?: number;
+  isNiche?: boolean;
   children: React.ReactNode;
 }
 
-function FilterSection({ title, defaultOpen = false, activeCount = 0, children }: FilterSectionProps) {
+function FilterSection({ title, defaultOpen = false, activeCount = 0, isNiche = false, children }: FilterSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-neutral-200/80 last:border-b-0 dark:border-white/10">
+    <div style={{ borderBottom: '1px solid #f5f5f5' }}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between py-5 text-left transition-colors hover:text-neutral-600 dark:hover:text-cream-dim"
+        style={{
+          display: 'flex',
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '20px 0',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left'
+        }}
       >
-        <span className="flex items-center gap-2">
-          <span className="text-[11px] font-bold tracking-[0.18em] text-neutral-900 uppercase dark:text-cream">
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#1C1917'
+          }}>
             {title}
           </span>
           {activeCount > 0 && (
-            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-neutral-900 px-1 text-[10px] font-bold text-white dark:bg-gold dark:text-dark-900">
+            <span style={{
+              display: 'flex',
+              height: '16px',
+              minWidth: '16px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              background: isNiche ? '#D4AF37' : '#CA8A04',
+              padding: '0 4px',
+              fontSize: '0.6rem',
+              fontWeight: 700,
+              color: isNiche ? '#000' : '#fff'
+            }}>
               {activeCount}
             </span>
           )}
         </span>
         <ChevronDown
-          size={15}
-          strokeWidth={1.5}
-          className={`text-neutral-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+          size={14}
+          style={{
+            color: '#ccc',
+            transition: 'transform 300ms ease',
+            transform: open ? 'rotate(180deg)' : 'rotate(0)'
+          }}
         />
       </button>
       <div
-        className={`grid transition-all duration-300 ease-out ${
-          open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-        }`}
+        style={{
+          maxHeight: open ? '1000px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 300ms ease-in-out',
+          opacity: open ? 1 : 0
+        }}
       >
-        <div className="overflow-hidden">
-          <div className="pb-5">{children}</div>
-        </div>
+        <div style={{ paddingBottom: '20px' }}>{children}</div>
       </div>
     </div>
   );
@@ -63,6 +96,7 @@ export interface CatalogueFiltersProps {
   onPriceChange: (min: number, max: number) => void;
   onClearAll?: () => void;
   showHeader?: boolean;
+  isNiche?: boolean;
 }
 
 export function FilterPanel({
@@ -78,6 +112,7 @@ export function FilterPanel({
   onPriceChange,
   onClearAll,
   showHeader = true,
+  isNiche = false,
 }: CatalogueFiltersProps) {
   const hasActiveFilters =
     !!selectedBrand ||
@@ -85,32 +120,61 @@ export function FilterPanel({
     priceMin > priceRange.min ||
     priceMax < priceRange.max;
 
-  const filterPill = (active: boolean) =>
-    `rounded-full border px-3.5 py-1.5 text-left text-[13px] transition-all duration-200 ${
-      active
-        ? 'border-neutral-900 bg-neutral-900 font-semibold text-white shadow-sm dark:border-gold dark:bg-gold dark:text-dark-900'
-        : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-900 dark:border-white/10 dark:bg-dark-700 dark:text-cream-dim dark:hover:border-gold/30 dark:hover:text-cream'
-    }`;
+  const btnStyle = (active: boolean) => ({
+    display: 'block',
+    width: '100%',
+    textAlign: 'left' as const,
+    padding: '10px 0',
+    fontSize: '0.8rem',
+    color: active ? (isNiche ? '#D4AF37' : '#CA8A04') : '#57534E',
+    fontWeight: active ? 600 : 400,
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 250ms ease'
+  });
 
-  const filterListBtn = (active: boolean) =>
-    `block w-full rounded-md px-2 py-2.5 text-left text-[13px] transition-all duration-200 ${
-      active
-        ? 'bg-neutral-100 font-semibold text-neutral-900 dark:bg-dark-600 dark:text-cream'
-        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 dark:text-cream-dim dark:hover:bg-dark-700 dark:hover:text-cream'
-    }`;
+  const pillStyle = (active: boolean) => ({
+    padding: '8px 16px',
+    fontSize: '0.75rem',
+    borderRadius: '10px',
+    border: active 
+      ? `1.5px solid ${isNiche ? '#D4AF37' : '#CA8A04'}` 
+      : '1px solid #E7E5E4',
+    background: active ? (isNiche ? '#D4AF37' : '#CA8A04') : '#FFFFFF',
+    color: active ? '#FFFFFF' : '#44403C',
+    cursor: 'pointer',
+    fontWeight: active ? 600 : 500,
+    transition: 'all 250ms ease'
+  });
 
   return (
     <>
       {showHeader && (
-        <div className="mb-6 flex items-center justify-between border-b border-neutral-200/80 pb-4 dark:border-white/10">
-          <p className="text-[11px] font-bold tracking-[0.18em] text-neutral-900 uppercase dark:text-cream">
-            Filtrer
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          marginBottom: '20px',
+          paddingBottom: '10px',
+          borderBottom: '1px solid #1C1917' 
+        }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: 0, color: '#1C1917' }}>
+            FILTRES
           </p>
           {hasActiveFilters && onClearAll && (
             <button
-              type="button"
               onClick={onClearAll}
-              className="text-[11px] font-semibold tracking-wide text-neutral-500 uppercase transition-colors hover:text-neutral-900 dark:text-cream-dim dark:hover:text-gold"
+              style={{
+                fontSize: '0.6rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                color: '#999',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
             >
               Effacer
             </button>
@@ -118,47 +182,34 @@ export function FilterPanel({
         </div>
       )}
 
-      <FilterSection title="Marques" activeCount={selectedBrand ? 1 : 0} defaultOpen>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onBrandChange('')} className={filterPill(!selectedBrand)}>
-            Toutes
-          </button>
+      <FilterSection title="Marques" activeCount={selectedBrand ? 1 : 0} defaultOpen isNiche={isNiche}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <button onClick={() => onBrandChange('')} style={btnStyle(!selectedBrand)}>Toutes les marques</button>
           {brands.map((brand) => (
             <button
               key={brand}
-              type="button"
               onClick={() => onBrandChange(brand)}
-              className={filterPill(selectedBrand === brand)}
+              style={btnStyle(selectedBrand === brand)}
             >
               {brand}
             </button>
           ))}
         </div>
-        {brands.length === 0 && (
-          <p className="mt-2 text-sm text-neutral-400">Aucune marque disponible</p>
-        )}
       </FilterSection>
 
-      <FilterSection title="Contenance" activeCount={selectedSize ? 1 : 0}>
-        {sizes.length === 0 ? (
-          <p className="text-sm text-neutral-400">Aucune contenance disponible</p>
-        ) : (
-          <div className="space-y-0.5">
-            <button type="button" onClick={() => onSizeChange('')} className={filterListBtn(!selectedSize)}>
-              Toutes
+      <FilterSection title="Contenance" activeCount={selectedSize ? 1 : 0} defaultOpen isNiche={isNiche}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <button onClick={() => onSizeChange('')} style={pillStyle(!selectedSize)}>Toutes</button>
+          {sizes.map((size) => (
+            <button
+              key={size}
+              onClick={() => onSizeChange(size)}
+              style={pillStyle(selectedSize === size)}
+            >
+              {size}
             </button>
-            {sizes.map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => onSizeChange(size)}
-                className={filterListBtn(selectedSize === size)}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        )}
+          ))}
+        </div>
       </FilterSection>
 
       {priceRange.max > 0 && (
@@ -166,6 +217,7 @@ export function FilterPanel({
           title="Prix"
           defaultOpen
           activeCount={priceMin > priceRange.min || priceMax < priceRange.max ? 1 : 0}
+          isNiche={isNiche}
         >
           <PriceRangeSlider
             min={priceRange.min}
@@ -182,10 +234,8 @@ export function FilterPanel({
 
 export default function CatalogueFilters(props: CatalogueFiltersProps) {
   return (
-    <aside className="hidden w-[260px] shrink-0 lg:block">
-      <div className="sticky top-36 rounded-xl border border-neutral-200/80 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-dark-800 dark:shadow-none">
-        <FilterPanel {...props} />
-      </div>
-    </aside>
+    <div style={{ paddingRight: '10px' }}>
+      <FilterPanel {...props} />
+    </div>
   );
 }

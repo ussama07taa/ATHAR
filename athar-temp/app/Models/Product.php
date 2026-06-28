@@ -18,6 +18,10 @@ class Product extends Model
         'meta_title',
         'meta_description',
         'is_pack',
+        'is_custom_pack',
+        'pack_slots',
+        'gender',
+        'is_niche',
         'is_active',
         'image',
         'badge_label',
@@ -25,7 +29,10 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'is_pack'   => 'boolean',
+        'is_pack'        => 'boolean',
+        'is_custom_pack' => 'boolean',
+        'pack_slots'     => 'integer',
+        'is_niche'       => 'boolean',
         'is_active' => 'boolean',
         'gallery'   => 'array',
     ];
@@ -53,6 +60,11 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function bundleProducts()
+    {
+        return $this->belongsToMany(Product::class, 'bundle_product', 'bundle_id', 'product_id');
     }
 
     public function relatedProducts()
@@ -91,6 +103,11 @@ class Product extends Model
     protected static function booted(): void
     {
         static::saving(function (Product $product) {
+            // Packs skip category validation as they are a collection of multiple categories
+            if ($product->is_pack) {
+                return;
+            }
+
             if ($product->category_id === null) {
                 throw new \InvalidArgumentException('La catégorie est obligatoire pour chaque produit.');
             }

@@ -28,18 +28,30 @@ export default function PriceRangeSlider({
 
   if (isSinglePrice) {
     return (
-      <p className="text-sm font-medium tracking-wide text-neutral-700 dark:text-cream-dim">
-        {formatPrice(min)} MAD
+      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0C0A09', margin: '10px 0' }}>
+        {formatPrice(min)} DH
       </p>
     );
   }
 
   return (
-    <div className="space-y-5">
-      <div className="relative h-1.5 rounded-full bg-neutral-200">
+    <div style={{ marginTop: '10px' }}>
+      <div style={{ 
+        position: 'relative', 
+        height: '2px', 
+        background: '#eee', 
+        borderRadius: '2px',
+        marginBottom: '20px'
+      }}>
         <div
-          className="absolute h-full rounded-full bg-neutral-900"
-          style={{ left: `${left}%`, width: `${width}%` }}
+          style={{ 
+            position: 'absolute', 
+            height: '100%', 
+            background: '#CA8A04', 
+            left: `${left}%`, 
+            width: `${width}%`,
+            transition: 'all 200ms ease'
+          }}
         />
         <input
           type="range"
@@ -47,8 +59,15 @@ export default function PriceRangeSlider({
           max={max}
           value={safeMin}
           onChange={(e) => onChange(Math.min(Number(e.target.value), safeMax), safeMax)}
-          className="catalogue-range catalogue-range-min absolute inset-0 w-full"
-          aria-label="Prix minimum"
+          className="range-thumb-min"
+          style={{ 
+            position: 'absolute', 
+            width: '100%', 
+            background: 'none', 
+            pointerEvents: 'none',
+            appearance: 'none',
+            top: '-6px'
+          }}
         />
         <input
           type="range"
@@ -56,13 +75,47 @@ export default function PriceRangeSlider({
           max={max}
           value={safeMax}
           onChange={(e) => onChange(safeMin, Math.max(Number(e.target.value), safeMin))}
-          className="catalogue-range catalogue-range-max absolute inset-0 w-full"
-          aria-label="Prix maximum"
+          className="range-thumb-max"
+          style={{ 
+            position: 'absolute', 
+            width: '100%', 
+            background: 'none', 
+            pointerEvents: 'none',
+            appearance: 'none',
+            top: '-6px'
+          }}
         />
       </div>
-      <p className="text-sm font-medium tracking-wide text-neutral-700 dark:text-cream-dim">
-        {formatPrice(safeMin)} MAD — {formatPrice(safeMax)} MAD
+      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#57534E', letterSpacing: '0.02em', marginTop: 12 }}>
+        {formatPrice(safeMin)} DH — {formatPrice(safeMax)} DH
       </p>
+
+      <style>{`
+        input[type=range]::-webkit-slider-thumb {
+          pointer-events: auto;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #fff;
+          border: 2px solid #CA8A04;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(202,138,4,0.15);
+          transition: transform 200ms ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+        }
+        input[type=range]::-moz-range-thumb {
+          pointer-events: auto;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #fff;
+          border: 2px solid #CA8A04;
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 }

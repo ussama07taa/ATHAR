@@ -73,15 +73,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch menu data on the server for instant megamenu
+  let initialMenuData = null;
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/collections?menu=true`, { next: { revalidate: 3600 } });
+    if (res.ok) {
+      const data = await res.json();
+      initialMenuData = data.find((c: any) => c.slug === 'parfums') || null;
+    }
+  } catch (e) {
+    console.error("Failed to fetch menu data on server", e);
+  }
+
   return (
     <html lang="fr" className="h-full" suppressHydrationWarning data-scroll-behavior="smooth">
       <body suppressHydrationWarning className="min-h-full flex flex-col antialiased">
-        <LayoutClient>
+        <LayoutClient initialMenuData={initialMenuData}>
           {children}
         </LayoutClient>
         <FloatingActions />

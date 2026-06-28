@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 const faqs = [
   {
@@ -50,9 +50,9 @@ function AccordionItem({ q, a, isLight }: { q: string, a: string, isLight: boole
   const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <div style={{ 
-      borderBottom: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-      padding: '20px 0'
+    <div className="theme-border" style={{ 
+      borderBottom: '1px solid',
+      padding: '24px 0'
     }}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
@@ -68,17 +68,16 @@ function AccordionItem({ q, a, isLight }: { q: string, a: string, isLight: boole
           textAlign: 'left'
         }}
       >
-        <span style={{ 
+        <span className="theme-title" style={{ 
           fontSize: '1.05rem', 
           fontWeight: 600, 
-          color: isLight ? '#111827' : '#F2EDE2',
           transition: 'color 200ms'
         }}>
           {q}
         </span>
         <motion.span 
           animate={{ rotate: isOpen ? 180 : 0 }}
-          style={{ color: '#C8A25C', fontSize: '1.2rem' }}
+          style={{ color: '#CA8A04', fontSize: '1.2rem' }}
         >
           ↓
         </motion.span>
@@ -93,11 +92,10 @@ function AccordionItem({ q, a, isLight }: { q: string, a: string, isLight: boole
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}
           >
-            <p style={{ 
+            <p className="theme-text" style={{ 
               marginTop: 16, 
               fontSize: '0.95rem', 
-              color: isLight ? '#4B5563' : '#C8BEA8', 
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               maxWidth: '90%'
             }}>
               {a}
@@ -110,8 +108,8 @@ function AccordionItem({ q, a, isLight }: { q: string, a: string, isLight: boole
 }
 
 export default function FAQPage() {
-  const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
 
   useEffect(() => { setMounted(true); }, []);
@@ -119,36 +117,38 @@ export default function FAQPage() {
   if (!mounted) return null;
 
   return (
-    <main style={{ maxWidth: 800, margin: '0 auto', padding: '120px 24px 100px' }}>
-      <div style={{ textAlign: 'center', marginBottom: 64 }}>
-        <h1 style={{ 
-          fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', 
+    <main style={{ maxWidth: 900, margin: '0 auto', padding: '120px 24px 120px', background: isLight ? '#FFFFFF' : '#0D0D0F', transition: 'all 500ms', minHeight: '100dvh' }}>
+      <div style={{ textAlign: 'center', marginBottom: 80 }}>
+        <h1 className="theme-title" style={{ 
+          fontSize: 'clamp(2.5rem, 6vw, 4rem)', 
           fontWeight: 800, 
-          color: isLight ? '#111827' : '#F2EDE2',
           letterSpacing: '-0.02em',
-          marginBottom: 16
+          marginBottom: 20,
+          fontFamily: 'var(--font-display)'
         }}>
           Questions Fréquentes
         </h1>
-        <p style={{ color: '#9B7A3D', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.8rem' }}>
+        <p style={{ color: '#CA8A04', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.85rem' }}>
           Tout ce que vous devez savoir sur Athar
         </p>
-        <div style={{ width: 48, height: 2, background: '#C8A25C', margin: '24px auto' }} />
+        <div style={{ width: 60, height: 3, background: '#CA8A04', margin: '32px auto', borderRadius: 2 }} />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 64 }}>
         {faqs.map((cat, idx) => (
           <div key={idx}>
             <h2 style={{ 
-              fontSize: '0.75rem', 
-              fontWeight: 700, 
-              color: '#C8A25C', 
+              fontSize: '0.8rem', 
+              fontWeight: 800, 
+              color: '#CA8A04', 
               textTransform: 'uppercase', 
               letterSpacing: '0.25em',
               marginBottom: 24,
-              borderLeft: '3px solid #C8A25C',
-              paddingLeft: 16
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16
             }}>
+              <span style={{ width: 4, height: 20, background: '#CA8A04', borderRadius: 2 }} />
               {cat.category}
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -160,28 +160,36 @@ export default function FAQPage() {
         ))}
       </div>
       
-      <div style={{ 
-        marginTop: 80, 
-        padding: 40, 
-        borderRadius: 24, 
-        background: isLight ? '#F9F7F2' : 'rgba(200,162,92,0.05)',
-        textAlign: 'center',
-        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(200,162,92,0.1)'}`
-      }}>
-        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2', marginBottom: 12 }}>
+      <div className="theme-bg-card theme-border" style={{ marginTop: 100, padding: '56px 40px', borderRadius: 32, textAlign: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.03)', border: '1px solid' }}>
+        <h3 className="theme-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 16 }}>
           Vous avez encore des questions ?
         </h3>
-        <p style={{ fontSize: '0.9rem', color: isLight ? '#4B5563' : '#C8BEA8', marginBottom: 24 }}>
-          Notre équipe est à votre disposition sur WhatsApp ou via notre formulaire de contact.
+        <p className="theme-text" style={{ fontSize: '0.95rem', marginBottom: 32, maxWidth: 500, margin: '0 auto 32px', lineHeight: 1.6 }}>
+          Notre équipe est à votre disposition sur WhatsApp ou via notre formulaire de contact pour vous accompagner.
         </p>
         <a 
           href="/contact" 
           style={{ 
-            color: '#C8A25C', 
+            display: 'inline-block',
+            padding: '14px 32px',
+            background: '#CA8A04',
+            color: '#fff',
             textDecoration: 'none', 
             fontWeight: 700, 
             fontSize: '0.9rem',
-            borderBottom: '1px solid #C8A25C'
+            borderRadius: 12,
+            transition: 'all 300ms ease',
+            boxShadow: '0 8px 20px rgba(202,138,4,0.2)',
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase'
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.background = '#A16207';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.background = '#CA8A04';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           Nous contacter

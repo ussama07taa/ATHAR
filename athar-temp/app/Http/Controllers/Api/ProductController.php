@@ -18,7 +18,14 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with(['variants', 'category', 'relatedProducts.variants', 'relatedProducts.category'])
+        $query = Product::with([
+            'variants', 
+            'category', 
+            'relatedProducts.variants', 
+            'relatedProducts.category',
+            'bundleProducts.variants',
+            'bundleProducts.category'
+        ])
             ->where('is_active', true);
 
         $this->applyCategoryFilter($query, $request->category);
@@ -29,6 +36,22 @@ class ProductController extends Controller
 
         if ($request->filled('size')) {
             $query->whereHas('variants', fn ($q) => $q->where('size', $request->size));
+        }
+
+        if ($request->boolean('is_niche')) {
+            $query->where('is_niche', true);
+        }
+
+        if ($request->boolean('is_pack')) {
+            $query->where('is_pack', true);
+        }
+
+        if ($request->boolean('is_arabic')) {
+            $query->where('is_arabic', true);
+        }
+
+        if ($request->filled('gender') && $request->gender !== 'all') {
+            $query->where('gender', $request->gender);
         }
 
         $products = $query->orderBy('name')->get();
@@ -47,20 +70,27 @@ class ProductController extends Controller
 
         $productIds = $query->pluck('id');
 
-        $brandsInCategory = Product::whereIn('id', $productIds)
-            ->whereNotNull('brand')
-            ->where('brand', '!=', '')
-            ->distinct()
-            ->pluck('brand');
+        // Get distinct brand IDs from the selected products
+        $brandIds = Product::whereIn('id', $productIds)
+            ->whereNotNull('brand_id')
+            ->pluck('brand_id')
+            ->unique()
+            ->filter();
 
-        $brands = Brand::query()
+        // Fetch brand names for those IDs
+        $brandsFromProducts = Brand::whereIn('id', $brandIds)
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->pluck('name')
-            ->merge($brandsInCategory)
-            ->unique()
-            ->values();
+            ->pluck('name');
+
+        // Include all active brands as fallback and merge
+        $allActiveBrands = Brand::where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name');
+
+        $brands = $allActiveBrands->merge($brandsFromProducts)->unique()->values();
 
         $sizes = ProductVariant::whereIn('product_id', $productIds)
             ->distinct()

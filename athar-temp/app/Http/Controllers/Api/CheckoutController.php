@@ -132,6 +132,9 @@ class CheckoutController extends Controller
             $lineItems = array_map(fn ($li) => array_merge($li, ['order_id' => $order->id]), $lineItems);
             DB::table('order_items')->insert($lineItems);
 
+            // Clean up abandoned cart
+            \App\Models\AbandonedCart::where('customer_phone', preg_replace('/\D/', '', $validated['customer_phone']))->delete();
+
             return $order;
         });
 
@@ -147,6 +150,32 @@ class CheckoutController extends Controller
             'status'           => $order->status,
             'whatsapp_url'     => $this->whatsappConfirmationUrl($order),
         ], 201);
+    }
+
+    /**
+     * POST /api/orders/abandoned
+     */
+    public function abandoned(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'customer_phone' => 'required|string|max:30',
+            'customer_name'  => 'nullable|string|max:255',
+            'items'          => 'required|array',
+        ]);
+
+        // Clean phone number for consistency
+        $phone = preg_replace('/\D/', '', $validated['customer_phone']);
+
+        \App\Models\AbandonedCart::updateOrCreate(
+            ['customer_phone' => $phone],
+            [
+                'customer_name' => $validated['customer_name'] ?? null,
+                'payload' => $validated['items'],
+                'updated_at' => now(), // explicitly touch to bubble it up
+            ]
+        );
+
+        return response()->json(['message' => 'Cart captured.']);
     }
 
     /**

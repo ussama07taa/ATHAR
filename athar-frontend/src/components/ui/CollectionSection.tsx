@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 /* ── Types ────────────────────────────────────────────────── */
 export interface Collection {
@@ -18,7 +19,7 @@ export default async function CollectionSection() {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000';
     const res = await fetch(`${backendUrl}/api/collections`, {
-      cache: 'no-store',
+      next: { revalidate: 3600 },
     });
     if (res.ok) collections = await res.json();
   } catch {
@@ -67,16 +68,13 @@ export default async function CollectionSection() {
             >
               {/* Image */}
               {col.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={col.image_url}
                   alt={col.name}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
                   style={{
-                    width: '100%',
-                    height: '100%',
                     objectFit: 'cover',
-                    position: 'absolute',
-                    inset: 0,
                   }}
                 />
               ) : (

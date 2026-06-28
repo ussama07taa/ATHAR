@@ -31,7 +31,7 @@ class ParfumsCategoryResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->inParfumsTree();
+        return parent::getEloquentQuery()->inParfumsTree()->with('parent');
     }
 
     public static function form(Form $form): Form

@@ -20,8 +20,8 @@ const legalLinks = [
 ];
 
 export default function Footer() {
-  const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
 
   useEffect(() => { setMounted(true); }, []);
@@ -29,17 +29,16 @@ export default function Footer() {
   return (
     <footer
       style={{
-        borderTop: `1px solid ${isLight ? 'rgba(200,162,92,0.2)' : 'rgba(200,162,92,0.12)'}`,
-        background: isLight ? 'rgba(245,242,236,0.98)' : 'rgba(13,13,15,0.98)',
-        marginTop: 80,
-        transition: 'background 300ms ease, border-color 300ms ease',
+        borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+        background: isLight ? '#F5F5F4' : '#1C1917',
+        marginTop: 100,
+        transition: 'all 400ms ease',
       }}
     >
-      {/* Gold gradient line */}
       <div
         style={{
           height: 1,
-          background: 'linear-gradient(90deg, transparent, #C8A25C55, #C8A25C, #C8A25C55, transparent)',
+          background: 'linear-gradient(90deg, transparent, #CA8A0455, #CA8A04, #CA8A0455, transparent)',
         }}
       />
 
@@ -58,9 +57,10 @@ export default function Footer() {
           <div style={{ marginBottom: 12 }}>
             <span
               style={{
-                fontSize: '1.5rem',
-                fontWeight: 800,
-                color: '#C8A25C',
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.6rem',
+                fontWeight: 700,
+                color: '#CA8A04',
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 display: 'block',
@@ -70,10 +70,13 @@ export default function Footer() {
             </span>
             <span
               style={{
-                fontSize: '0.55rem',
-                color: '#9B7A3D',
-                letterSpacing: '0.3em',
+                fontSize: '0.5rem',
+                fontWeight: 600,
+                color: '#A16207',
+                letterSpacing: '0.4em',
                 textTransform: 'uppercase',
+                marginTop: 4,
+                display: 'block'
               }}
             >
               Maison de Parfums Marocains
@@ -82,7 +85,7 @@ export default function Footer() {
           <p
             style={{
               fontSize: '0.8rem',
-              color: isLight ? '#374151' : '#6B6654',
+              color: isLight ? '#44403C' : '#A8A29E',
               lineHeight: 1.7,
               maxWidth: 260,
               margin: 0,
@@ -97,12 +100,12 @@ export default function Footer() {
         <div>
           <p
             style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              color: '#C8A25C',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: '#CA8A04',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              marginBottom: 16,
+              marginBottom: 20,
             }}
           >
             Navigation
@@ -112,12 +115,8 @@ export default function Footer() {
               <Link
                 key={href}
                 href={href}
-                style={{
-                  fontSize: '0.8rem',
-                  color: isLight ? '#374151' : '#C8BEA8',
-                  textDecoration: 'none',
-                  transition: 'color 200ms',
-                }}
+                onMouseEnter={e => e.currentTarget.style.color = '#CA8A04'}
+                onMouseLeave={e => e.currentTarget.style.color = isLight ? '#44403C' : '#A8A29E'}
               >
                 {label}
               </Link>
@@ -129,12 +128,12 @@ export default function Footer() {
         <div>
           <p
             style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              color: '#C8A25C',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: '#CA8A04',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              marginBottom: 16,
+              marginBottom: 20,
             }}
           >
             Contact
@@ -145,7 +144,7 @@ export default function Footer() {
               siteConfig.email,
               siteConfig.city,
             ].map((label) => (
-              <p key={label} style={{ margin: 0, fontSize: '0.8rem', color: isLight ? '#374151' : '#6B6654', transition: 'color 300ms ease' }}>
+              <p key={label} style={{ margin: 0, fontSize: '0.8rem', color: isLight ? '#44403C' : '#A8A29E', transition: 'color 300ms ease' }}>
                 {label}
               </p>
             ))}
@@ -156,12 +155,12 @@ export default function Footer() {
         <div>
           <p
             style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              color: '#C8A25C',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: '#CA8A04',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              marginBottom: 16,
+              marginBottom: 20,
             }}
           >
             Garanties
@@ -195,7 +194,7 @@ export default function Footer() {
             ].map(({ icon, label }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {icon}
-                <span style={{ fontSize: '0.75rem', color: isLight ? '#374151' : '#C8BEA8', transition: 'color 300ms ease' }}>{label}</span>
+                <span style={{ fontSize: '0.75rem', color: isLight ? '#44403C' : '#A8A29E', transition: 'color 300ms ease' }}>{label}</span>
               </div>
             ))}
           </div>
@@ -208,11 +207,11 @@ export default function Footer() {
         justifyContent: 'center',
         gap: 24,
         padding: '32px 24px',
-        borderTop: `1px solid ${isLight ? 'rgba(200,162,92,0.15)' : 'rgba(200,162,92,0.08)'}`,
+        borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
       }}>
         {[
           { 
-            href: 'https://instagram.com/athar', 
+            href: 'https://www.instagram.com/atha_rfragrances/', 
             icon: (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
@@ -220,7 +219,7 @@ export default function Footer() {
             )
           },
           { 
-            href: 'https://tiktok.com/@athar', 
+            href: 'https://www.tiktok.com/@atha_rfragrances?is_from_webapp=1&sender_device=pc', 
             icon: (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
@@ -248,7 +247,7 @@ export default function Footer() {
       {/* Legal links */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap', padding: '0 24px 16px' }}>
         {legalLinks.map(({ href, label }) => (
-          <Link key={href} href={href} style={{ fontSize: '0.7rem', color: isLight ? '#6B7280' : '#6B6654', textDecoration: 'none' }}>
+          <Link key={href} href={href} style={{ fontSize: '0.7rem', color: isLight ? '#44403C' : '#A8A29E', textDecoration: 'none' }}>
             {label}
           </Link>
         ))}
@@ -257,12 +256,12 @@ export default function Footer() {
       {/* Bottom bar */}
       <div
         style={{
-          borderTop: `1px solid ${isLight ? 'rgba(200,162,92,0.1)' : 'rgba(200,162,92,0.04)'}`,
+          borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
           padding: '16px 24px',
           textAlign: 'center',
         }}
       >
-        <p style={{ margin: 0, fontSize: '0.65rem', color: isLight ? '#6B7280' : '#6B6654', letterSpacing: '0.08em', transition: 'color 300ms ease' }}>
+        <p style={{ margin: 0, fontSize: '0.65rem', color: isLight ? '#44403C' : '#A8A29E', letterSpacing: '0.08em', transition: 'color 300ms ease' }}>
           © {new Date().getFullYear()} Athar — Maison de Parfums Marocains. Tous droits réservés.
         </p>
       </div>
