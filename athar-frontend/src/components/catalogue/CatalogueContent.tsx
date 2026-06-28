@@ -14,6 +14,7 @@ interface CatalogueContentProps {
   isNiche?: boolean;
   isPack?: boolean;
   isArabic?: boolean;
+  isDecant?: boolean;
 }
 
 export default function CatalogueContent({ 
@@ -21,7 +22,8 @@ export default function CatalogueContent({
   initialFilters = { brands: [], sizes: [] },
   isNiche = false,
   isPack = false,
-  isArabic = false
+  isArabic = false,
+  isDecant = false
 }: CatalogueContentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -84,6 +86,7 @@ export default function CatalogueContent({
     if (isNiche) params.set('is_niche', '1');
     if (isPack) params.set('is_pack', '1');
     if (isArabic) params.set('is_arabic', '1');
+    if (isDecant) params.set('is_decant', '1');
     
     const genderParam = searchParams.get('gender');
     if (genderParam && genderParam !== 'all') {

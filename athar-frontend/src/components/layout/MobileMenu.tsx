@@ -26,6 +26,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
   const isLight = mounted && resolvedTheme === 'light';
   const [parfumsMenu, setParfumsMenu] = useState<MenuCategory | null>(null);
   const [parfumsExpanded, setParfumsExpanded] = useState(false);
+  const [decantageExpanded, setDecantageExpanded] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -45,6 +46,7 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
     } else {
       document.body.style.overflow = 'unset';
       setParfumsExpanded(false);
+      setDecantageExpanded(false);
     }
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
@@ -199,6 +201,75 @@ export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProp
                   </AnimatePresence>
                 </div>
               )}
+
+              {/* Décantage accordion */}
+              <div>
+                <button
+                  onClick={() => setDecantageExpanded(!decantageExpanded)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: linkColor(pathname.startsWith('/decantage-des-parfums')),
+                    letterSpacing: '0.05em',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: 0,
+                    transition: 'color 200ms ease'
+                  }}
+                >
+                  Décantage
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ transform: decantageExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms' }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                <AnimatePresence>
+                  {decantageExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      style={{ overflow: 'hidden', marginTop: 16, paddingLeft: 8 }}
+                    >
+                      <Link
+                        href="/decantage-des-parfums"
+                        onClick={onClose}
+                        style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#CA8A04', textDecoration: 'none', marginBottom: 20 }}
+                      >
+                        Tous les décantages
+                      </Link>
+                      <Link
+                        href="/decantage-des-parfums?gender=homme"
+                        onClick={onClose}
+                        style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2', textDecoration: 'none', marginBottom: 16 }}
+                      >
+                        Pour les Hommes
+                      </Link>
+                      <Link
+                        href="/decantage-des-parfums?gender=femme"
+                        onClick={onClose}
+                        style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2', textDecoration: 'none', marginBottom: 16 }}
+                      >
+                        Pour les Femmes
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {navLinks.slice(1).map(({ href, label }) => (
                 <Link

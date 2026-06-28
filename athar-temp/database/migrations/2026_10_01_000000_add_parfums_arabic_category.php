@@ -15,7 +15,7 @@ return new class extends Migration {
         DB::table('categories')->insert([
             'name' => 'Parfums Arabic',
             'slug' => 'parfums-arabic',
-            'is_active' => true,
+            'is_visible' => true,
             'sort_order' => 999, // place at end; adjust as needed
             'created_at' => now(),
             'updated_at' => now(),

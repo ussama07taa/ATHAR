@@ -50,6 +50,10 @@ class ProductController extends Controller
             $query->where('is_arabic', true);
         }
 
+        if ($request->boolean('is_decant')) {
+            $query->where('is_decant', true);
+        }
+
         if ($request->filled('gender') && $request->gender !== 'all') {
             $query->where('gender', $request->gender);
         }
@@ -67,6 +71,22 @@ class ProductController extends Controller
     {
         $query = Product::query()->where('is_active', true);
         $this->applyCategoryFilter($query, $request->category);
+
+        if ($request->boolean('is_niche')) {
+            $query->where('is_niche', true);
+        }
+
+        if ($request->boolean('is_pack')) {
+            $query->where('is_pack', true);
+        }
+
+        if ($request->boolean('is_arabic')) {
+            $query->where('is_arabic', true);
+        }
+
+        if ($request->boolean('is_decant')) {
+            $query->where('is_decant', true);
+        }
 
         $productIds = $query->pluck('id');
 

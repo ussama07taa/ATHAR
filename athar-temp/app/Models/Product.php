@@ -22,6 +22,8 @@ class Product extends Model
         'pack_slots',
         'gender',
         'is_niche',
+        'is_arabic',
+        'is_decant',
         'is_active',
         'image',
         'badge_label',
@@ -33,8 +35,10 @@ class Product extends Model
         'is_custom_pack' => 'boolean',
         'pack_slots'     => 'integer',
         'is_niche'       => 'boolean',
-        'is_active' => 'boolean',
-        'gallery'   => 'array',
+        'is_arabic'      => 'boolean',
+        'is_decant'      => 'boolean',
+        'is_active'      => 'boolean',
+        'gallery'        => 'array',
     ];
 
     protected $appends = ['image_url', 'gallery_urls'];

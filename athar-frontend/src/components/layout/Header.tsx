@@ -34,6 +34,7 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [parfumsMenu, setParfumsMenu] = useState<MenuCategory | null>(initialMenuData ?? null);
   const [isParfumsOpen, setIsParfumsOpen] = useState(false);
+  const [isDecantageOpen, setIsDecantageOpen] = useState(false);
  
   useEffect(() => {
     if (parfumsMenu) return; // Skip if already have data from server
@@ -330,6 +331,100 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
             <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
           )}
         </Link>
+
+        {/* Décantage dropdown */}
+        <div
+          style={{ position: 'relative' }}
+          onMouseEnter={() => setIsDecantageOpen(true)}
+          onMouseLeave={() => setIsDecantageOpen(false)}
+        >
+          <Link
+            href="/decantage-des-parfums"
+            style={{
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: pathname.startsWith('/decantage-des-parfums') ? '#CA8A04' : '#A16207',
+              textDecoration: 'none',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              transition: 'all 300ms ease',
+              position: 'relative',
+              padding: '4px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            Décantage
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: 1 }}>
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+            {pathname.startsWith('/decantage-des-parfums') && (
+              <motion.div layoutId="activeNav" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5, background: '#CA8A04', borderRadius: 1 }} />
+            )}
+          </Link>
+          <AnimatePresence>
+            {isDecantageOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  background: isLight ? '#FFFFFF' : '#1C1917',
+                  border: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                  borderRadius: 4,
+                  padding: '8px 0',
+                  minWidth: 160,
+                  marginTop: 8,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  zIndex: 200,
+                }}
+              >
+                <Link
+                  href="/decantage-des-parfums?gender=homme"
+                  onClick={() => setIsDecantageOpen(false)}
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    color: isLight ? '#44403C' : '#D6D3D1',
+                    padding: '10px 16px',
+                    textDecoration: 'none',
+                    transition: 'background 200ms ease',
+                    display: 'block',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = isLight ? '#F5F5F4' : '#292524'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  Pour les Hommes
+                </Link>
+                <Link
+                  href="/decantage-des-parfums?gender=femme"
+                  onClick={() => setIsDecantageOpen(false)}
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    color: isLight ? '#44403C' : '#D6D3D1',
+                    padding: '10px 16px',
+                    textDecoration: 'none',
+                    transition: 'background 200ms ease',
+                    display: 'block',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = isLight ? '#F5F5F4' : '#292524'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  Pour les Femmes
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
 
         {/* Parfums dropdown */}
         {parfumsMenu && (

@@ -82,12 +82,18 @@ class ProductResource extends Resource
                                             ->helperText('Cocher pour afficher dans la section Parfums Arabic.')
                                             ->default(false)
                                             ->inline(false),
+
+                                        Forms\Components\Toggle::make('is_decant')
+                                            ->label('🧪 Parfum Decant')
+                                            ->helperText('Cocher pour afficher dans la section Decantage.')
+                                            ->default(false)
+                                            ->inline(false),
                                     ])
                                     ->columnSpan(1),
                             ]),
 
-                        Forms\Components\Hidden::make('is_pack'),
-                        Forms\Components\Hidden::make('is_niche'),
+                        Forms\Components\Hidden::make('is_pack')->default(false),
+                        Forms\Components\Hidden::make('is_niche')->default(false),
                     ]),
 
                 // 2. PACK CONFIGURATION
