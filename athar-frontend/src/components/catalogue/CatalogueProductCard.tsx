@@ -100,43 +100,21 @@ export default function CatalogueProductCard({ product, priority = false, isNich
         </div>
 
         {/* Info */}
-        <div style={{ padding: '4px 2px', textAlign: 'center' }}>
+        <div style={{ padding: '6px 2px 2px', textAlign: 'center' }}>
           {product.is_pack && (
-            <span style={{ 
-              fontSize: '0.6rem', 
-              fontWeight: 800, 
-              color: '#CA8A04', 
-              letterSpacing: '0.1em', 
-              textTransform: 'uppercase',
-              display: 'block',
-              marginBottom: 4
-            }}>
+            <span className="prod-pack-badge">
               PACK DECANTE
             </span>
           )}
-          <h3 style={{
-            margin: '0 0 8px',
-            fontSize: '1.05rem',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 600,
-            color: '#0C0A09',
-            textTransform: isNiche ? 'uppercase' : 'capitalize',
-            letterSpacing: isNiche ? '0.08em' : '0.01em',
-          }}>
+          <h3 className="prod-title">
             {product.name}
           </h3>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-            <p style={{
-              margin: 0,
-              fontSize: '0.9rem',
-              color: isNiche ? '#D4AF37' : '#6B6654',
-              fontWeight: 700,
-              letterSpacing: '0.05em'
-            }}>
+            <p className="prod-price">
               {selected ? `${parseFloat(selected.price).toFixed(2)} MAD` : ''}
             </p>
             {product.is_pack && (
-              <span style={{ fontSize: '0.7rem', color: '#111', fontWeight: 700, borderBottom: '1px solid #111' }}>PERSONNALISER</span>
+              <span className="prod-pack-label">DÉCOUVRIR</span>
             )}
           </div>
         </div>
@@ -145,6 +123,54 @@ export default function CatalogueProductCard({ product, priority = false, isNich
       <style>{`
         .hover-zoom:hover {
           transform: scale(1.05);
+        }
+        .prod-title {
+          margin: 0 0 6px;
+          font-size: 0.85rem;
+          font-family: var(--font-display);
+          font-weight: 600;
+          color: #0C0A09;
+          text-transform: ${isNiche ? 'uppercase' : 'capitalize'};
+          letter-spacing: ${isNiche ? '0.08em' : '0.01em'};
+          line-height: 1.2;
+        }
+        .prod-price {
+          margin: 0;
+          font-size: 0.8rem;
+          color: ${isNiche ? '#D4AF37' : '#6B6654'};
+          font-weight: 700;
+          letter-spacing: 0.05em;
+        }
+        .prod-pack-label {
+          font-size: 0.6rem;
+          color: #111;
+          font-weight: 700;
+          border-bottom: 1px solid #111;
+        }
+        .prod-pack-badge {
+          font-size: 0.55rem;
+          font-weight: 800;
+          color: #CA8A04;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        @media (min-width: 640px) {
+          .prod-title {
+            font-size: 1.05rem;
+            margin: 0 0 8px;
+          }
+          .prod-price {
+            font-size: 0.9rem;
+          }
+          .prod-pack-label {
+            font-size: 0.7rem;
+          }
+          .prod-pack-badge {
+            font-size: 0.6rem;
+          }
         }
       `}</style>
     </article>

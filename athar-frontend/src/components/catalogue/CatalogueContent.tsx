@@ -180,14 +180,18 @@ export default function CatalogueContent({
     }}>
       
       <style>{`
-        .cat-container { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+        .cat-container { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+        @media (min-width: 768px) { .cat-container { padding: 0 24px; } }
+        @media (min-width: 1024px) { .cat-container { padding: 0 40px; } }
         .cat-sidebar { width: 240px; flex-shrink: 0; display: none; }
         @media (min-width: 1024px) { .cat-sidebar { display: block; } }
         
         .cat-main { flex: 1; min-width: 0; }
-        .cat-grid { display: grid; gap: 20px 15px; padding-bottom: 80px; }
+        .cat-grid { display: grid; gap: 12px 8px; padding-bottom: 60px; }
         .grid-4 { grid-template-columns: repeat(2, 1fr); }
-        @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); gap: 40px 25px; } }
+        @media (min-width: 640px) { .cat-grid { gap: 16px 12px; } }
+        @media (min-width: 768px) { .grid-4 { grid-template-columns: repeat(3, 1fr); } .cat-grid { gap: 24px 16px; } }
+        @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } .cat-grid { gap: 40px 25px; } }
         
         .skeleton-item { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
@@ -291,7 +295,7 @@ export default function CatalogueContent({
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
-            gap: 40, 
+            gap: 20, 
             marginBottom: 20,
             borderBottom: '1px solid #f0f0f0',
             paddingBottom: 15
