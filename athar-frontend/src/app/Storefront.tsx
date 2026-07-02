@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Product, ProductVariant } from './page';
+import { Product, ProductVariant } from '@/types/product';
 import CheckoutForm from './CheckoutForm';
 
 export interface CartItem {
