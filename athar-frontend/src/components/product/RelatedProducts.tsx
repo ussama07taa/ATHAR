@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Product, ProductVariant } from '@/app/page';
+import { Product, ProductVariant } from '@/types/product';
 import useCartStore from '@/store/cartStore';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';

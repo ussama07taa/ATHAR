@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import CatalogueContent from '@/components/catalogue/CatalogueContent';
 import { API_URL } from '@/lib/api';
-import { Product } from '@/app/page';
+import { Product } from '@/types/product';
 
 function NicheFallback() {
   return (

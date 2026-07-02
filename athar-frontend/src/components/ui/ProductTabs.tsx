@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ProductCard from './ProductCard';
-import { Product } from '@/app/page';
+import { Product } from '@/types/product';
 
 export default function ProductTabs({ products }: { products: Product[] }) {
   const [activeTab, setActiveTab] = useState<'HOMME' | 'FEMME'>('HOMME');

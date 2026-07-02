@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import useCartStore from '@/store/cartStore';
-import { Product, ProductVariant, bottleColors, PerfumeBottle } from '@/app/page';
+import { Product, ProductVariant } from '@/types/product';
+import { bottleColors, PerfumeBottle } from '@/lib/productUtils';
+
 
 interface ProductCardProps {
   product: Product;
