@@ -2,13 +2,7 @@
 
 import { useState } from 'react';
 import { Product, ProductVariant } from '@/types/product';
-import CheckoutForm from './CheckoutForm';
-
-export interface CartItem {
-  variant: ProductVariant;
-  productName: string;
-  quantity: number;
-}
+import CheckoutForm, { CartItem } from './CheckoutForm';
 
 interface ProductCardProps {
   product: Product;
@@ -97,14 +91,14 @@ export default function Storefront({ products }: { products: Product[] }) {
     setCart(prev => {
       const exists = prev.find(item => item.variant.id === variant.id);
       if (exists) return prev;
-      return [...prev, { variant, productName, quantity: 1 }];
+      return [...prev, { cartId: String(variant.id), variant, productName, quantity: 1 }];
     });
   };
 
-  const updateQty = (variantId: number, qty: number) => {
+  const updateQty = (cartId: string, qty: number) => {
     setCart(prev => {
-      if (qty <= 0) return prev.filter(item => item.variant.id !== variantId);
-      return prev.map(item => item.variant.id === variantId ? { ...item, quantity: qty } : item);
+      if (qty <= 0) return prev.filter(item => item.cartId !== cartId);
+      return prev.map(item => item.cartId === cartId ? { ...item, quantity: qty } : item);
     });
   };
 
