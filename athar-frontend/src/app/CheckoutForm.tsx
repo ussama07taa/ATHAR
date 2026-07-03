@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { API_URL } from '@/lib/api';
+
+
 export interface CartItem {
   cartId: string;
   variant: {
@@ -42,7 +45,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
     setStatus('loading');
     setErrorMsg('');
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -185,7 +188,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
               onChange={(e) => setForm((f) => ({ ...f, customer_phone: e.target.value }))}
               onBlur={() => {
                 if (form.customer_phone.length > 8 && cart.length > 0) {
-                  fetch('http://127.0.0.1:8000/api/orders/abandoned', {
+                  fetch(`${API_URL}/api/orders/abandoned`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

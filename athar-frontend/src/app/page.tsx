@@ -46,7 +46,8 @@ function buildProductSchema(products: Product[]) {
 export default async function Home() {
   let products: Product[] = [];
   try {
-    const res = await fetch('http://127.0.0.1:8000/api/products', { next: { revalidate: 3600 } });
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.atharfragrances.ma';
+    const res = await fetch(`${apiUrl}/api/products`, { next: { revalidate: 3600 } });
     if (res.ok) products = await res.json();
   } catch {
     /* server offline */
