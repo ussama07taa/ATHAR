@@ -17,7 +17,7 @@ export default async function CollectionSection() {
   let collections: Collection[] = [];
 
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.atharfragrances.ma';
     const res = await fetch(`${backendUrl}/api/collections`, {
       next: { revalidate: 3600 },
     });

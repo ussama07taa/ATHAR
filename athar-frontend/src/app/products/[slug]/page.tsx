@@ -5,7 +5,7 @@ import RelatedProducts from '@/components/product/RelatedProducts';
 import BoxBuilder from '@/components/product/BoxBuilder';
 import { Product } from '@/types/product';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.atharfragrances.ma';
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://athar.ma';
 
 async function getProduct(slug: string): Promise<Product | null> {

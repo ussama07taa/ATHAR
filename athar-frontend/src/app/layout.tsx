@@ -81,7 +81,7 @@ export default async function RootLayout({
   // Fetch menu data on the server for instant megamenu
   let initialMenuData = null;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/collections?menu=true`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.atharfragrances.ma'}/api/collections?menu=true`, { next: { revalidate: 3600 } });
     if (res.ok) {
       const data = await res.json();
       initialMenuData = data.find((c: any) => c.slug === 'parfums') || null;
