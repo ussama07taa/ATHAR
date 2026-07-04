@@ -6,6 +6,7 @@ import { Product, ProductVariant } from '@/types/product';
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
@@ -123,7 +124,7 @@ function ProductCard({ product }: { product: Product }) {
 export default function StorefrontV2({ products, banners = [] }: { products: Product[], banners?: any[] }) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'homme' | 'femme'>('homme');
+  const [activeTab, setActiveTab] = useState<'homme' | 'femme' | 'tout'>('tout');
 
   useEffect(() => {
     setMounted(true);
@@ -131,28 +132,45 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
 
   const isLight = mounted && resolvedTheme === 'light';
 
+  // Filters
+  const nouveautes = products.slice(0, 4); // Simulate new arrivals
+  
+  const orientalProducts = products.filter(p => 
+    p.category?.slug?.toLowerCase().includes('arabic') || 
+    p.name.toLowerCase().includes('oud') ||
+    p.name.toLowerCase().includes('musc')
+  ).slice(0, 4);
+
   const hommeProducts = products.filter(p =>
     p.gender === 'homme' || p.gender === 'unisex' ||
     p.category?.slug?.toLowerCase().includes('homme') ||
     p.category?.name?.toLowerCase().includes('homme')
   );
+  
   const femmeProducts = products.filter(p =>
     p.gender === 'femme' || p.gender === 'unisex' ||
     p.category?.slug?.toLowerCase().includes('femme') ||
     p.category?.name?.toLowerCase().includes('femme')
   );
 
-  const displayedProducts = activeTab === 'homme'
-    ? (hommeProducts.length > 0 ? hommeProducts : products)
-    : (femmeProducts.length > 0 ? femmeProducts : products);
+  let displayedProducts = products;
+  if (activeTab === 'homme') displayedProducts = hommeProducts;
+  if (activeTab === 'femme') displayedProducts = femmeProducts;
+  
+  // Limiting displayed to 8 for the grid to keep it clean, but showing more than 4
+  const mainGridProducts = displayedProducts.slice(0, 8);
 
   const activeBanner = banners.length > 0 ? banners[0] : null;
 
   return (
     <div style={{ background: isLight ? '#FAFAFA' : '#0D0D0F', minHeight: '100vh', transition: 'background 300ms ease' }}>
       
-      {/* Global CSS for responsive grid */}
+      {/* Global CSS */}
       <style>{`
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .product-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -177,181 +195,142 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
             height: 85vh;
           }
         }
+        .scroll-container::-webkit-scrollbar {
+          display: none;
+        }
       `}</style>
 
-      {/* Cinematic Hero Banner - Always Dark for contrast */}
-      <div className="hero-banner" style={{ 
-        width: '100%', 
-        position: 'relative', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: '#000',
-        overflow: 'hidden'
-      }}>
-        {/* Main Hero Image */}
+      {/* Cinematic Hero Banner */}
+      <div className="hero-banner" style={{ width: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', overflow: 'hidden' }}>
         <Image 
           src={activeBanner?.image_url || "/images/hero_premium.png"} 
           alt={activeBanner?.title || "Athar Premium Collection"} 
           fill
           priority
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.05)' }} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.05)', opacity: 0.8 }} 
         />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%)' }} />
 
-        {/* Ambient Dark Overlay */}
-        <div style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.6) 100%)' 
-        }} />
+        <div style={{ position: 'absolute', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px', zIndex: 10 }}>
+          <p style={{ color: '#CA8A04', fontSize: '0.7rem', letterSpacing: '0.4em', textTransform: 'uppercase', margin: '0 0 16px', fontWeight: 600, animation: 'fadeInDown 0.8s ease-out' }}>
+            {activeBanner?.top_label || 'MAISON DE PARFUMS'}
+          </p>
 
-        {/* Liquid Glass Overlay Content */}
-        <div style={{ 
-          position: 'absolute', 
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 24px',
-          zIndex: 10
-        }}>
-          {/* Top Label */}
-          <p style={{
-            color: '#CA8A04',
-            fontSize: '0.7rem',
-            letterSpacing: '0.4em',
-            textTransform: 'uppercase',
-            margin: '0 0 16px',
-            fontWeight: 600,
-            animation: 'fadeInDown 0.8s ease-out'
-          }}>{activeBanner?.top_label || 'MAISON DE PARFUMS'}</p>
-
-          {/* Central Glass Content */}
-          <div style={{ 
-            background: 'rgba(255,255,255,0.03)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            padding: '40px 60px',
-            borderRadius: '1px',
-            textAlign: 'center',
-            position: 'relative',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
-          }}>
-            <h1 style={{ 
-              fontSize: 'clamp(2.25rem, 5vw, 4.5rem)', 
-              fontWeight: 400, 
-              margin: '0 0 10px', 
-              letterSpacing: '0.15em',
-              color: '#fff',
-              fontFamily: 'var(--font-display, serif)',
-              textTransform: 'uppercase'
-            }}>{activeBanner?.title || 'Athar Parfums'}</h1>
+          <div style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.1)', padding: '40px 60px', borderRadius: '1px', textAlign: 'center', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <h1 style={{ fontSize: 'clamp(2.25rem, 5vw, 4.5rem)', fontWeight: 400, margin: '0 0 10px', letterSpacing: '0.15em', color: '#fff', fontFamily: 'var(--font-display, serif)', textTransform: 'uppercase' }}>
+              {activeBanner?.title || 'Athar Parfums'}
+            </h1>
             
             {(activeBanner?.subtitle || 'Collection Privée') && (
-              <h2 style={{ 
-                fontSize: 'clamp(1rem, 2.5vw, 1.8rem)', 
-                fontWeight: 300, 
-                margin: '0 0 24px', 
-                color: 'rgba(255,255,255,0.85)',
-                fontFamily: 'var(--font-display, serif)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase'
-              }}>{activeBanner?.subtitle || 'Collection Privée'}</h2>
+              <h2 style={{ fontSize: 'clamp(1rem, 2.5vw, 1.8rem)', fontWeight: 300, margin: '0 0 24px', color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-display, serif)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {activeBanner?.subtitle || 'Collection Privée'}
+              </h2>
             )}
 
-            <div style={{ 
-              width: '60px', 
-              height: '1px', 
-              background: '#CA8A04', 
-              margin: '0 auto 24px' 
-            }} />
+            <div style={{ width: '60px', height: '1px', background: '#CA8A04', margin: '0 auto 24px' }} />
 
-            <a href={activeBanner?.button_link || '/catalogue'} style={{ 
-              color: '#fff', 
-              background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.3)',
-              padding: '12px 32px',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-              transition: 'all 300ms ease',
-              display: 'inline-block'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = '#fff';
-              e.currentTarget.style.color = '#000';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = '#fff';
-            }}
-            >{activeBanner?.button_text || 'Découvrir la collection'}</a>
+            <a href={activeBanner?.button_link || '/catalogue'} style={{ color: '#fff', background: 'transparent', border: '1px solid rgba(255,255,255,0.3)', padding: '12px 32px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms ease', display: 'inline-block' }} onMouseOver={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#000'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fff'; }}>
+              {activeBanner?.button_text || 'Découvrir la collection'}
+            </a>
           </div>
-
         </div>
       </div>
 
-      {/* Trust Badges Bar */}
-      <div className="theme-bg-card" style={{ 
-        maxWidth: 1400, 
-        margin: '20px auto 40px', 
-        display: 'flex', 
-        justifyContent: 'space-around', 
-        flexWrap: 'wrap', 
-        gap: '20px', 
-        padding: '20px',
-        borderRadius: '8px',
-        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-        boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)'
-      }}>
-         <div style={{display:'flex', alignItems:'center', gap: 10}}>
-            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>🚚</span>
+      {/* Trust Badges - Premium SVG */}
+      <div className="theme-bg-card" style={{ maxWidth: 1400, margin: '20px auto 40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', padding: '24px 20px', borderRadius: '8px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)' }}>
+         <div style={{display:'flex', alignItems:'center', gap: 12}}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Livraison Rapide</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Partout au Maroc</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 10}}>
-            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>💵</span>
+         <div style={{display:'flex', alignItems:'center', gap: 12}}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Paiement Cash</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À la livraison (COD)</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 10}}>
-            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>⭐</span>
+         <div style={{display:'flex', alignItems:'center', gap: 12}}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Qualité Supérieure</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Essences premium</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 10}}>
-            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>💬</span>
+         <div style={{display:'flex', alignItems:'center', gap: 12}}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <div>
-              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Support Client</p>
-              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Assistance VIP</p>
+              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Support VIP</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À votre écoute</p>
             </div>
          </div>
       </div>
 
-      {/* Section Header */}
+      {/* SECTION 1: NOUVEAUTÉS EXCLUSIVES */}
+      {nouveautes.length > 0 && (
+        <div style={{ padding: '40px 0', borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <p style={{ margin: '0 0 10px', fontSize: '0.65rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#CA8A04', fontWeight: 700 }}>Découvrez nos derniers joyaux</p>
+            <h2 className="theme-title" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 300, fontFamily: 'var(--font-display, serif)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nouveautés <strong style={{ fontWeight: 600 }}>Exclusives</strong></h2>
+          </div>
+          
+          <div className="product-grid">
+            {nouveautes.map((p) => (
+              <ProductCard key={`nouveau-${p.id}`} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 2: LA COLLECTION ORIENTALE (ARABIC) */}
+      {orientalProducts.length > 0 && (
+        <div style={{ 
+          margin: '60px 0', 
+          background: isLight ? 'linear-gradient(to right, #FDFBF7, #F6F2EB)' : 'linear-gradient(to right, #110E0B, #1A1612)', 
+          padding: '60px 20px', 
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Decorative Oriental Elements */}
+          <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(202,138,4,0.1) 0%, rgba(202,138,4,0) 70%)' }} />
+          <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(202,138,4,0.05) 0%, rgba(202,138,4,0) 70%)' }} />
+
+          <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ textAlign: 'center', marginBottom: '50px', zIndex: 2 }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1" style={{ marginBottom: 16 }}>
+                <path d="M12 2L15 10L23 11L17 16.5L19 24L12 20L5 24L7 16.5L1 11L9 10L12 2Z" fill="rgba(202,138,4,0.1)" />
+              </svg>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontWeight: 400, fontFamily: 'var(--font-display, serif)', margin: '0 0 16px', textTransform: 'uppercase', letterSpacing: '0.15em', color: isLight ? '#111827' : '#F2EDE2' }}>
+                L'âme de <span style={{ color: '#CA8A04', fontStyle: 'italic' }}>l'Orient</span>
+              </h2>
+              <p style={{ maxWidth: '600px', margin: '0 auto', fontSize: '0.9rem', lineHeight: 1.8, color: isLight ? '#57534E' : '#A8A29E' }}>
+                Plongez dans notre collection privée d'essences arabes. De l'Oud cambodgien majestueux au musc pur, des sillages intenses et envoûtants.
+              </p>
+            </div>
+
+            <div className="product-grid" style={{ width: '100%', padding: 0 }}>
+              {orientalProducts.map((p) => (
+                <ProductCard key={`oriental-${p.id}`} product={p} />
+              ))}
+            </div>
+
+            <a href="/catalogue?category=arabic" style={{ marginTop: '40px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 36px', background: 'transparent', border: '1px solid #CA8A04', color: '#CA8A04', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms' }} onMouseOver={(e) => { e.currentTarget.style.background = '#CA8A04'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CA8A04'; }}>
+              Voir toute la collection Orientale
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 3: BOUTIQUE CLASSIQUE (BEST SELLERS) */}
       <div style={{ textAlign: 'center', padding: '60px 20px 40px' }}>
-        <p className="theme-text" style={{
-          margin: '0 0 15px',
-          fontSize: '0.6rem',
-          letterSpacing: '0.4em',
-          textTransform: 'uppercase',
-          fontWeight: 600,
-        }}>Meilleure Vente</p>
+        <p className="theme-text" style={{ margin: '0 0 15px', fontSize: '0.6rem', letterSpacing: '0.4em', textTransform: 'uppercase', fontWeight: 600 }}>Découvrez nos</p>
+        <h2 className="theme-title" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 300, fontFamily: 'var(--font-display, serif)', margin: '0 0 30px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Best <strong style={{ fontWeight: 600 }}>Sellers</strong></h2>
 
         {/* Category Tabs */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 40 }}>
-          {(['homme', 'femme'] as const).map((tab) => (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 30, flexWrap: 'wrap' }}>
+          {(['tout', 'homme', 'femme'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -359,70 +338,40 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '10px 0',
-                fontSize: '1.8rem',
-                fontWeight: activeTab === tab ? 500 : 300,
+                padding: '10px 15px',
+                fontSize: '1.2rem',
+                fontWeight: activeTab === tab ? 600 : 400,
                 fontFamily: 'var(--font-display, serif)',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: activeTab === tab ? (isLight ? '#111827' : '#F2EDE2') : (isLight ? '#44403C' : '#A8A29E'),
-                opacity: activeTab === tab ? 1 : 0.4,
+                color: activeTab === tab ? '#CA8A04' : (isLight ? '#44403C' : '#A8A29E'),
+                opacity: activeTab === tab ? 1 : 0.6,
                 position: 'relative',
                 transition: 'all 300ms ease',
               }}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
               {activeTab === tab && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: isLight ? '#111827' : '#F2EDE2',
-                }} />
+                <motion.div layoutId="underline" style={{ position: 'absolute', bottom: 0, left: '10%', right: '10%', height: '2px', background: '#CA8A04' }} />
               )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Product Grid - Dual Grid for Instant Switching */}
       <div style={{ position: 'relative', maxWidth: 1400, margin: '0 auto' }}>
-        {/* Homme Grid */}
-        <div 
-          className="product-grid" 
-          style={{ 
-            display: activeTab === 'homme' ? 'grid' : 'none',
-            opacity: activeTab === 'homme' ? 1 : 0,
-            transition: 'opacity 300ms ease'
-          }}
-        >
-          {hommeProducts.slice(0, 4).map((p) => (
-            <ProductCard key={`${p.id}-homme`} product={p} />
-          ))}
-        </div>
-
-        {/* Femme Grid */}
-        <div 
-          className="product-grid" 
-          style={{ 
-            display: activeTab === 'femme' ? 'grid' : 'none',
-            opacity: activeTab === 'femme' ? 1 : 0,
-            transition: 'opacity 300ms ease'
-          }}
-        >
-          {femmeProducts.slice(0, 4).map((p) => (
-            <ProductCard key={`${p.id}-femme`} product={p} />
+        <div className="product-grid">
+          {mainGridProducts.map((p) => (
+            <ProductCard key={`main-${p.id}`} product={p} />
           ))}
         </div>
       </div>
 
       {/* VIEW ALL Button */}
-      {displayedProducts.length > 4 && (
+      {displayedProducts.length > 8 && (
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <a
-            href={`/catalogue?category=${activeTab === 'homme' ? 'hommes' : 'femmes'}`}
+            href={`/catalogue${activeTab !== 'tout' ? `?category=${activeTab === 'homme' ? 'hommes' : 'femmes'}` : ''}`}
             style={{
               display: 'inline-block',
               background: 'transparent',
@@ -437,40 +386,19 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
               transition: 'all 300ms ease',
               borderRadius: '2px'
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = isLight ? '#111827' : '#F2EDE2';
-              e.currentTarget.style.color = isLight ? '#FFFFFF' : '#000000';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = isLight ? '#111827' : '#F2EDE2';
-            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = isLight ? '#111827' : '#F2EDE2'; e.currentTarget.style.color = isLight ? '#FFFFFF' : '#000000'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = isLight ? '#111827' : '#F2EDE2'; }}
           >
-            VIEW ALL
+            VOIR TOUS LES PARFUMS
           </a>
         </div>
       )}
 
       {/* CTA Footer */}
       <div style={{ textAlign: 'center', padding: '60px 24px 100px', borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` }}>
-        <a
-          href="/catalogue"
-          style={{
-            display: 'inline-block',
-            borderBottom: `1px solid ${isLight ? '#111827' : '#F2EDE2'}`,
-            color: isLight ? '#111827' : '#F2EDE2',
-            padding: '4px 0',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            textDecoration: 'none',
-            transition: 'opacity 200ms ease'
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.opacity = '0.6')}
-          onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
-        >
-          Découvrir toute la collection
+        <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-display, serif)', margin: '0 0 24px', color: isLight ? '#111827' : '#F2EDE2' }}>Trouvez votre signature olfactive.</h3>
+        <a href="/catalogue" style={{ display: 'inline-block', borderBottom: `1px solid ${isLight ? '#111827' : '#F2EDE2'}`, color: isLight ? '#111827' : '#F2EDE2', padding: '4px 0', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', transition: 'opacity 200ms ease' }} onMouseOver={(e) => (e.currentTarget.style.opacity = '0.6')} onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}>
+          Explorer le Catalogue
         </a>
       </div>
     </div>

@@ -72,8 +72,6 @@ export default async function ProductPage({ params }: Props) {
       style={{
         minHeight: '100dvh',
         transition: 'background-color 300ms ease',
-        background: product.is_niche ? '#FCFBFA' : '#fff',
-        color: '#1C1917'
       }}
     >
       <script
