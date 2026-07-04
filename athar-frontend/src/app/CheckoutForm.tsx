@@ -28,6 +28,8 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
     customer_name: '',
     customer_phone: '',
     customer_city: '',
+    customer_address: '',
+    customer_quartier: '',
   });
   const [status, setStatus] = useState<Status>('idle');
   const [orderNumber, setOrderNumber] = useState('');
@@ -51,7 +53,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
         body: JSON.stringify({
           ...form,
           items: cart.map((i) => ({ 
-            product_variant_id: i.variant.id, 
+            variant_id: i.variant.id, 
             quantity: i.quantity 
           })),
         }),
@@ -119,7 +121,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
             }}
             onClick={() => { 
               setStatus('idle'); 
-              setForm({ customer_name: '', customer_phone: '', customer_city: '' }); 
+              setForm({ customer_name: '', customer_phone: '', customer_city: '', customer_address: '', customer_quartier: '' }); 
             }}
           >
             Nouvelle commande
@@ -205,6 +207,16 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
             <label htmlFor="customer_city" style={{ display: 'block', fontSize: '0.75rem', color: '#C8BEA8', marginBottom: 4 }}>Ville *</label>
             <input id="customer_city" className="athar-input" required placeholder="Tanger"
               value={form.customer_city} onChange={(e) => setForm((f) => ({ ...f, customer_city: e.target.value }))} />
+          </div>
+          <div>
+            <label htmlFor="customer_quartier" style={{ display: 'block', fontSize: '0.75rem', color: '#C8BEA8', marginBottom: 4 }}>Quartier *</label>
+            <input id="customer_quartier" className="athar-input" required placeholder="Malabata, Centre Ville..."
+              value={form.customer_quartier} onChange={(e) => setForm((f) => ({ ...f, customer_quartier: e.target.value }))} />
+          </div>
+          <div>
+            <label htmlFor="customer_address" style={{ display: 'block', fontSize: '0.75rem', color: '#C8BEA8', marginBottom: 4 }}>Adresse complète *</label>
+            <input id="customer_address" className="athar-input" required placeholder="Rue, numéro, immeuble..."
+              value={form.customer_address} onChange={(e) => setForm((f) => ({ ...f, customer_address: e.target.value }))} />
           </div>
         </div>
       </div>
