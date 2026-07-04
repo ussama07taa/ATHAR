@@ -177,104 +177,70 @@ export default function CartDrawer() {
                     transition={{ delay: i * 0.05 }}
                     style={{
                       background: isLight ? '#FAFAFA' : '#1C1917',
-                      border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-                      borderRadius: 14,
-                      padding: '14px 16px',
+                      border: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
+                      borderRadius: 16,
+                      padding: '16px',
                       display: 'flex',
-                      alignItems: 'center',
+                      flexDirection: 'column',
                       gap: 12,
                       transition: 'all 300ms ease',
                     }}
                   >
-                    {/* Product Image */}
-                    <div
-                      style={{
-                        width: 54,
-                        height: 54,
-                        borderRadius: 8,
-                        background: isLight ? '#FFFFFF' : '#0D0D0F',
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
-                        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-                        position: 'relative'
-                      }}
-                    >
-                      {item.imageUrl ? (
-                        <Image src={item.imageUrl} alt={item.productName} fill sizes="54px" style={{ objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', background: isLight ? '#FFFFFF' : '#0D0D0F' }} />
-                      )}
-                    </div>
-211: 
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: isLight ? '#111827' : '#F2EDE2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.productName}
-                      </p>
-                      
-                      {/* Bundle Contents (NEW) */}
-                      {item.bundleContents && item.bundleContents.length > 0 && (
-                        <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          {item.bundleContents.map((p, idx) => (
-                            <div key={idx} style={{ fontSize: '0.65rem', color: isLight ? '#666' : '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <span style={{ color: '#CA8A04' }}>•</span> {p.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-228: 
-                      <p style={{ margin: 0, fontSize: '0.725rem', color: '#CA8A04', marginTop: 3, fontWeight: 500 }}>
-                        {item.variantName} — {item.price.toFixed(2)} dh
-                      </p>
-                    </div>
-233: 
-                    {/* Qty Controls */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '20px', padding: '2px' }}>
-                        <button
-                          onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
-                          style={{
-                            width: 24,
-                            height: 24,
-                            borderRadius: '50%',
-                            border: 'none',
-                            background: 'transparent',
-                            color: isLight ? '#111827' : '#F2EDE2',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 200ms',
-                          }}
-                        >
-                          −
-                        </button>
-                        <span style={{ minWidth: 20, textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
-                          style={{
-                            width: 24,
-                            height: 24,
-                            borderRadius: '50%',
-                            border: 'none',
-                            background: 'transparent',
-                            color: isLight ? '#111827' : '#F2EDE2',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 200ms',
-                          }}
-                        >
-                          +
-                        </button>
+                    {/* Top Row: Image + Name + Delete */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      {/* Product Image */}
+                      <div
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 10,
+                          background: isLight ? '#FFFFFF' : '#0D0D0F',
+                          flexShrink: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                          border: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
+                          position: 'relative'
+                        }}
+                      >
+                        {item.imageUrl ? (
+                          <Image src={item.imageUrl} alt={item.productName} fill sizes="60px" style={{ objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', background: isLight ? '#F5F5F4' : '#1C1917' }} />
+                        )}
                       </div>
-                      
+
+                      {/* Name + Size */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          margin: 0,
+                          fontSize: '0.88rem',
+                          fontWeight: 700,
+                          color: isLight ? '#111827' : '#F2EDE2',
+                          lineHeight: 1.3,
+                          letterSpacing: '0.01em',
+                          wordBreak: 'break-word',
+                        }}>
+                          {item.productName}
+                        </p>
+                        <p style={{ margin: '5px 0 0', fontSize: '0.72rem', color: '#CA8A04', fontWeight: 600 }}>
+                          {item.variantName}
+                        </p>
+
+                        {/* Bundle Contents */}
+                        {item.bundleContents && item.bundleContents.length > 0 && (
+                          <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {item.bundleContents.map((p, idx) => (
+                              <div key={idx} style={{ fontSize: '0.65rem', color: isLight ? '#666' : '#999', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span style={{ color: '#CA8A04' }}>•</span> {p.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Delete button */}
                       <button
                         onClick={() => removeItem(item.cartId)}
                         aria-label="Supprimer"
@@ -289,15 +255,42 @@ export default function CartDrawer() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          flexShrink: 0,
                           transition: 'all 200ms',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'; }}
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
                       </button>
+                    </div>
+
+                    {/* Bottom Row: Price + Qty Controls */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '1rem', fontWeight: 800, color: isLight ? '#111827' : '#F2EDE2' }}>
+                        {(item.price * item.quantity).toFixed(2)} <span style={{ fontSize: '0.7rem', color: isLight ? '#78716C' : '#A8A29E', fontWeight: 500 }}>dh</span>
+                      </span>
+
+                      {/* Qty Controls */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '24px', padding: '2px 4px' }}>
+                        <button
+                          onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
+                          style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', color: isLight ? '#111827' : '#F2EDE2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', transition: 'all 200ms' }}
+                        >
+                          −
+                        </button>
+                        <span style={{ minWidth: 28, textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: isLight ? '#111827' : '#F2EDE2' }}>
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
+                          style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', color: isLight ? '#111827' : '#F2EDE2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', transition: 'all 200ms' }}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))
