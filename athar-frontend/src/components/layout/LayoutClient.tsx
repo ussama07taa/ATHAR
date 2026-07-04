@@ -11,9 +11,9 @@ import { ThemeProvider } from 'next-themes';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
-  { href: '/about', label: 'Histoire' },
+  // { href: '/about', label: 'Histoire' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
+  // { href: '/contact', label: 'Contact' },
 ];
 
 export default function LayoutClient({ children, initialMenuData }: { children: React.ReactNode, initialMenuData?: any }) {

@@ -13,9 +13,9 @@ import Image from 'next/image';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
-  { href: '/about', label: 'Histoire' },
+  // { href: '/about', label: 'Histoire' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
+  // { href: '/contact', label: 'Contact' },
 ];
 
 export default function Header({ initialMenuData }: { initialMenuData?: MenuCategory | null }) {

@@ -9,7 +9,7 @@ import { siteConfig } from '@/lib/site-config';
 
 const navLinks = [
   { href: '/catalogue', label: 'Catalogue' },
-  { href: '/about', label: 'À propos' },
+  // { href: '/about', label: 'À propos' },
   { href: '/suivi', label: 'Suivi commande' },
 ];
 

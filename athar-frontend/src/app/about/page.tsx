@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import { notFound } from 'next/navigation';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -16,6 +17,7 @@ const stagger = {
 };
 
 export default function AboutPage() {
+  notFound();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';

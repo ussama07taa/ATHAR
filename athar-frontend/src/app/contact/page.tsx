@@ -85,7 +85,10 @@ const contacts = [
   },
 ];
 
+import { notFound } from 'next/navigation';
+
 export default function ContactPage() {
+  notFound();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
