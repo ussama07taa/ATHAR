@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { Truck, Wallet, Award, Headset } from 'lucide-react';
 
 function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
@@ -238,29 +239,29 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
 
       {/* Trust Badges - Premium SVG */}
       <div className="theme-bg-card" style={{ maxWidth: 1400, margin: '20px auto 40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', padding: '24px 20px', borderRadius: '8px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)' }}>
-         <div style={{display:'flex', alignItems:'center', gap: 12}}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+         <div style={{display:'flex', alignItems:'center', gap: 14}}>
+            <Truck size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Livraison Rapide</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Partout au Maroc</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 12}}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
+         <div style={{display:'flex', alignItems:'center', gap: 14}}>
+            <Wallet size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Paiement Cash</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À la livraison (COD)</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 12}}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+         <div style={{display:'flex', alignItems:'center', gap: 14}}>
+            <Award size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Qualité Supérieure</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Essences premium</p>
             </div>
          </div>
-         <div style={{display:'flex', alignItems:'center', gap: 12}}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+         <div style={{display:'flex', alignItems:'center', gap: 14}}>
+            <Headset size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Support VIP</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À votre écoute</p>
