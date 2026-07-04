@@ -244,30 +244,30 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
       </div>
 
       {/* Trust Badges - Premium SVG */}
-      <div className="theme-bg-card" style={{ maxWidth: 1400, margin: '20px auto 40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', padding: '24px 20px', borderRadius: '8px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)' }}>
+      <div className="theme-bg-card grid grid-cols-2 lg:grid-cols-4 gap-6" style={{ maxWidth: 1400, margin: '20px auto 40px', padding: '24px 20px', borderRadius: '8px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)' }}>
          <div style={{display:'flex', alignItems:'center', gap: 14}}>
-            <Truck size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
+            <Truck size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))', flexShrink: 0 }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Livraison Rapide</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Partout au Maroc</p>
             </div>
          </div>
          <div style={{display:'flex', alignItems:'center', gap: 14}}>
-            <Wallet size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
+            <Wallet size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))', flexShrink: 0 }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Paiement Cash</p>
-              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À la livraison (COD)</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À la livraison</p>
             </div>
          </div>
          <div style={{display:'flex', alignItems:'center', gap: 14}}>
-            <Award size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
+            <Award size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))', flexShrink: 0 }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Qualité Supérieure</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Essences premium</p>
             </div>
          </div>
          <div style={{display:'flex', alignItems:'center', gap: 14}}>
-            <Headset size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))' }} />
+            <Headset size={32} strokeWidth={1.5} color="#CA8A04" style={{ filter: 'drop-shadow(0 2px 4px rgba(202,138,4,0.2))', flexShrink: 0 }} />
             <div>
               <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Support VIP</p>
               <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À votre écoute</p>
@@ -323,7 +323,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
               ))}
             </div>
 
-            <a href="/parfums-arabic" style={{ marginTop: '40px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 36px', background: 'transparent', border: '1px solid #CA8A04', color: '#CA8A04', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms' }} onMouseOver={(e) => { e.currentTarget.style.background = '#CA8A04'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CA8A04'; }}>
+            <a href="/parfums-arabic" className="w-[90%] sm:w-auto justify-center text-center" style={{ marginTop: '40px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 24px', background: 'transparent', border: '1px solid #CA8A04', color: '#CA8A04', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms' }} onMouseOver={(e) => { e.currentTarget.style.background = '#CA8A04'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CA8A04'; }}>
               Voir toute la collection Orientale
             </a>
           </div>
