@@ -45,10 +45,15 @@ function buildProductSchema(products: Product[]) {
 /* ── Page (Server Component) ──────────────────────────────── */
 export default async function Home() {
   let products: Product[] = [];
+  let banners: any[] = [];
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.atharfragrances.ma';
-    const res = await fetch(`${apiUrl}/api/products`, { next: { revalidate: 3600 } });
-    if (res.ok) products = await res.json();
+    const [resProducts, resBanners] = await Promise.all([
+      fetch(`${apiUrl}/api/products`, { next: { revalidate: 60 } }),
+      fetch(`${apiUrl}/api/banners`, { next: { revalidate: 60 } })
+    ]);
+    if (resProducts.ok) products = await resProducts.json();
+    if (resBanners.ok) banners = await resBanners.json();
   } catch {
     /* server offline */
   }
@@ -65,7 +70,7 @@ export default async function Home() {
         />
       )}
 
-      <StorefrontV2 products={products} />
+      <StorefrontV2 products={products} banners={banners} />
     </main>
   );
 }

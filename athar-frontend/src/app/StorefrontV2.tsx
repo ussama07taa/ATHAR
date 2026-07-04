@@ -120,7 +120,7 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export default function StorefrontV2({ products }: { products: Product[] }) {
+export default function StorefrontV2({ products, banners = [] }: { products: Product[], banners?: any[] }) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'homme' | 'femme'>('homme');
@@ -143,6 +143,8 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
   const displayedProducts = activeTab === 'homme'
     ? (hommeProducts.length > 0 ? hommeProducts : products)
     : (femmeProducts.length > 0 ? femmeProducts : products);
+
+  const activeBanner = banners.length > 0 ? banners[0] : null;
 
   return (
     <div style={{ background: isLight ? '#FAFAFA' : '#0D0D0F', minHeight: '100vh', transition: 'background 300ms ease' }}>
@@ -187,8 +189,8 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
       }}>
         {/* Main Hero Image */}
         <Image 
-          src="/images/hero_premium.png" 
-          alt="Athar Premium Collection" 
+          src={activeBanner?.image_url || "/images/hero_premium.png"} 
+          alt={activeBanner?.title || "Athar Premium Collection"} 
           fill
           priority
           style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.05)' }} 
@@ -222,7 +224,7 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
             margin: '0 0 16px',
             fontWeight: 600,
             animation: 'fadeInDown 0.8s ease-out'
-          }}>MAISON DE PARFUMS</p>
+          }}>{activeBanner?.top_label || 'MAISON DE PARFUMS'}</p>
 
           {/* Central Glass Content */}
           <div style={{ 
@@ -244,17 +246,19 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
               color: '#fff',
               fontFamily: 'var(--font-display, serif)',
               textTransform: 'uppercase'
-            }}>Athar Parfums</h1>
+            }}>{activeBanner?.title || 'Athar Parfums'}</h1>
             
-            <h2 style={{ 
-              fontSize: 'clamp(1rem, 2.5vw, 1.8rem)', 
-              fontWeight: 300, 
-              margin: '0 0 24px', 
-              color: 'rgba(255,255,255,0.85)',
-              fontFamily: 'var(--font-display, serif)',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase'
-            }}>Collection Privée</h2>
+            {(activeBanner?.subtitle || 'Collection Privée') && (
+              <h2 style={{ 
+                fontSize: 'clamp(1rem, 2.5vw, 1.8rem)', 
+                fontWeight: 300, 
+                margin: '0 0 24px', 
+                color: 'rgba(255,255,255,0.85)',
+                fontFamily: 'var(--font-display, serif)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase'
+              }}>{activeBanner?.subtitle || 'Collection Privée'}</h2>
+            )}
 
             <div style={{ 
               width: '60px', 
@@ -263,7 +267,7 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
               margin: '0 auto 24px' 
             }} />
 
-            <a href="/catalogue" style={{ 
+            <a href={activeBanner?.button_link || '/catalogue'} style={{ 
               color: '#fff', 
               background: 'transparent',
               border: '1px solid rgba(255,255,255,0.3)',
@@ -284,7 +288,7 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
               e.currentTarget.style.background = 'transparent';
               e.currentTarget.style.color = '#fff';
             }}
-            >Découvrir la collection</a>
+            >{activeBanner?.button_text || 'Découvrir la collection'}</a>
           </div>
 
           {/* Bottom Badge */}
@@ -303,6 +307,49 @@ export default function StorefrontV2({ products }: { products: Product[] }) {
             <span style={{ color: '#fff', fontSize: '0.7rem', fontWeight: 600 }}>France & Maroc</span>
           </div>
         </div>
+      </div>
+
+      {/* Trust Badges Bar */}
+      <div className="theme-bg-card" style={{ 
+        maxWidth: 1400, 
+        margin: '20px auto 40px', 
+        display: 'flex', 
+        justifyContent: 'space-around', 
+        flexWrap: 'wrap', 
+        gap: '20px', 
+        padding: '20px',
+        borderRadius: '8px',
+        border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+        boxShadow: isLight ? '0 4px 15px rgba(0,0,0,0.02)' : '0 4px 15px rgba(0,0,0,0.2)'
+      }}>
+         <div style={{display:'flex', alignItems:'center', gap: 10}}>
+            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>🚚</span>
+            <div>
+              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Livraison Rapide</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Partout au Maroc</p>
+            </div>
+         </div>
+         <div style={{display:'flex', alignItems:'center', gap: 10}}>
+            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>💵</span>
+            <div>
+              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Paiement Cash</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>À la livraison (COD)</p>
+            </div>
+         </div>
+         <div style={{display:'flex', alignItems:'center', gap: 10}}>
+            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>⭐</span>
+            <div>
+              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Qualité Supérieure</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Essences premium</p>
+            </div>
+         </div>
+         <div style={{display:'flex', alignItems:'center', gap: 10}}>
+            <span style={{fontSize:'1.8rem', color: '#CA8A04'}}>💬</span>
+            <div>
+              <p className="theme-title" style={{margin:0, fontSize:'0.85rem', fontWeight:600}}>Support Client</p>
+              <p className="theme-text" style={{margin:0, fontSize:'0.75rem', opacity:0.7}}>Assistance VIP</p>
+            </div>
+         </div>
       </div>
 
       {/* Section Header */}

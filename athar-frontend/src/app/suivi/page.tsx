@@ -23,24 +23,19 @@ function TrackForm() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isLight = mounted && resolvedTheme === 'light';
-  const [orderNumber, setOrderNumber] = useState(searchParams.get('order') ?? '');
-  const [phone, setPhone] = useState('');
+  const [orderNumber, setOrderNumber] = useState(searchParams.get('order') ?? searchParams.get('commande') ?? '');
+  const [phone, setPhone] = useState(searchParams.get('tele') ?? '');
   const [order, setOrder] = useState<OrderTrack | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
-
-  if (!mounted) return null;
-
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchOrderDetails = async (orderNum: string, phoneNum: string) => {
     setLoading(true);
     setError('');
     setOrder(null);
 
     try {
-      const params = new URLSearchParams({ order_number: orderNumber.trim(), phone: phone.trim() });
+      const params = new URLSearchParams({ order_number: orderNum.trim(), phone: phoneNum.trim() });
       const res = await fetch(`/api/orders/track?${params}`);
       const data = await res.json();
       if (!res.ok) throw new Error(parseApiError(data, 'Commande introuvable'));
@@ -50,6 +45,22 @@ function TrackForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => { 
+    setMounted(true); 
+    const orderParam = searchParams.get('order') ?? searchParams.get('commande');
+    const phoneParam = searchParams.get('tele');
+    if (orderParam && phoneParam) {
+      fetchOrderDetails(orderParam, phoneParam);
+    }
+  }, [searchParams]);
+
+  if (!mounted) return null;
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchOrderDetails(orderNumber, phone);
   };
 
   return (
