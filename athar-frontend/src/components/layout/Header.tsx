@@ -165,9 +165,9 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
             <Image 
               src="/logo.png" 
               alt="Athar Maison de Parfums" 
-              width={90} 
-              height={120} 
-              style={{ objectFit: 'contain', filter: isLight ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.05))' : 'drop-shadow(0 4px 10px rgba(202,138,4,0.15))' }}
+              width={100} 
+              height={105} 
+              style={{ filter: isLight ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.05))' : 'drop-shadow(0 4px 10px rgba(202,138,4,0.15))' }}
               priority
             />
           </motion.div>
