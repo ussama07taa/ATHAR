@@ -27,7 +27,7 @@ class CheckoutController extends Controller
             'customer_name'          => 'required|string|max:255',
             'customer_phone'         => 'required|string|max:30',
             'customer_city'          => 'required|string|max:100',
-            'customer_address'       => 'required|string|max:255',
+            'customer_address'       => 'nullable|string|max:255',
             'customer_quartier'      => 'required|string|max:100',
             'promo_code'             => 'nullable|string|max:50',
             'items'                  => 'required|array|min:1',

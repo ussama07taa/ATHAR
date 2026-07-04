@@ -37,7 +37,6 @@ export default function CheckoutPage() {
     customer_phone: '',
     customer_city: '',
     customer_quartier: '',
-    customer_address: '',
   });
   const [status, setStatus] = useState<Status>('idle');
   const [orderNumber, setOrderNumber] = useState('');
@@ -164,7 +163,6 @@ export default function CheckoutPage() {
     { id: 'customer_phone', label: 'Téléphone *', placeholder: '06 61 23 45 67', type: 'tel' },
     { id: 'customer_city', label: 'Ville *', placeholder: 'Tanger', type: 'text' },
     { id: 'customer_quartier', label: 'Quartier *', placeholder: 'Malabata, Centre-ville...', type: 'text' },
-    { id: 'customer_address', label: 'Adresse complète *', placeholder: 'Rue, numéro, immeuble...', type: 'text' },
   ] as const;
 
   return (
