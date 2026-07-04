@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public storefront routes ───────────────────────────────────────────
 Route::get('/site/config',          [SiteConfigController::class, 'show']);
+Route::get('/banners',              [\App\Http\Controllers\Api\BannerController::class, 'index']);
 Route::get('/collections',          [CollectionController::class, 'index']);
 Route::get('/collections/menu',     [CollectionController::class, 'menu']);
 Route::get('/collections/{slug}',   [CollectionController::class, 'show']);
