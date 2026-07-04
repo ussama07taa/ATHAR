@@ -291,21 +291,6 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
             >{activeBanner?.button_text || 'Découvrir la collection'}</a>
           </div>
 
-          {/* Bottom Badge */}
-          <div style={{ 
-            marginTop: '32px',
-            padding: '8px 20px',
-            background: 'rgba(202, 138, 4, 0.1)',
-            border: '1px solid rgba(202, 138, 4, 0.3)',
-            borderRadius: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10
-          }}>
-            <span style={{ color: '#CA8A04', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em' }}>LIVRAISON GRATUITE</span>
-            <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#CA8A04' }} />
-            <span style={{ color: '#fff', fontSize: '0.7rem', fontWeight: 600 }}>France & Maroc</span>
-          </div>
         </div>
       </div>
 
