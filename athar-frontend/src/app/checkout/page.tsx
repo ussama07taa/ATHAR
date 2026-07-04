@@ -11,6 +11,48 @@ import { useTheme } from 'next-themes';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
+// ── Security helpers
+function sanitize(v: string) { return v.replace(/<[^>]*>/g, '').replace(/[<>"'`{}()\[\]\\]/g, '').replace(/javascript:/gi, '').trim().slice(0, 256); }
+function sanitizeName(v: string) { return v.replace(/[^a-zA-ZÀ-ÿ\s'\-.]/g, '').slice(0, 100); }
+function sanitizePhone(v: string) { return v.replace(/[^\d\s+\-()]/g, '').slice(0, 20); }
+const isValidPhone = (p: string) => /^(\+212|0)([ -]?\d){9}$/.test(p.replace(/\s/g, ''));
+
+// ── Morocco cities + quartiers
+const MOROCCO_CITIES: Record<string, string[]> = {
+  'Casablanca': ['Ain Chock','Ain Diab','Ain Sebaa','Al Fida','Anfa',"Ben M'Sick",'Bernoussi','Bourgogne','Californie','CIL','Derb Omar','Derb Sultan','El Hank','Gauthier','Hay Hassani','Hay Mohammadi','Lissasfa','Maârif','Maârif Extension','Mers Sultan','Moulay Rachid','Nassim','Palmier','Roches Noires','Salmia','Sbata','Sidi Belyout','Sidi Bernoussi','Sidi Moumen','Sidi Othmane','Tit Mellil','Université','Val Fleuri'],
+  'Rabat': ['Agdal','Akkari','Aviation','Centre-ville','Diour Jamaa','El Youssoufia','Harhoura','Hassan','Hay El Fath','Hay Riad','Instituts','Kébibat','Médina','Mellah','Océan','Orangers','Salé Bettana','Salé Médina','Salé Hay Salam','Souissi','Tabriquet','Takaddoum','Temara','Yacoub El Mansour'],
+  'Marrakech': ['Agdal','Amelkis','Bab Doukkala','Centre-ville','Daoudiate','El Massira','Guéliz','Hay Hassani','Hay Mohammadi','Hivernage','Issil','Médina','Mellah',"M'Hamid",'Ménara','Palmeraie','Semlalia','Sidi Youssef Ben Ali','Tamansourt','Targa','Tensift','Victor Hugo'],
+  'Fès': ['Ain Chkef','Aouinet Hajjaj','Batha','Centre-ville','Dhar Mehraz','Fès El Bali','Fès El Jdid','Hay Adarissa','Hay Al Farah','Hay Hassani','Hay Narjis','Les Almohades','Médina','Narjisse','Oued Fès','Saiss','Ville Nouvelle','Zouagha'],
+  'Tanger': ['Achakar','Ain Ktiouet','Bni Makada','Boubana','Centre-ville','Charf','Dradeb','Gzennnaya','Hay Al Khalij','Hay Hassani','Hay Saddam','Joliot Curie','Ksar Sghir','Malabata','Marchane','Mesnana','Mishan','Moujahidine',"M'Ghogha",'Place de France','Port','Route de Tétouan','Souani','Tanja Balia','Val Fleuri'],
+  'Agadir': ['Anza','Bensergao','Centre-ville','Cité Dakhla','Dcheira','Founty','Hay Almass','Hay Hassani','Hay Mohammadi','Hay Salama','Inezgane','Lqliaa','Nassim','Nouveau Talborjt','Souk El Had','Tikiouine','Tilila'],
+  'Meknès': ['Al Hamriyae','Bassatine','Centre-ville','Cité Administrative','Hamriya','Hay Salam','El Mansour','Isly','Médina','Mellah','Mikou','Nouvelle ville','Plaisance','Riad','Toulal','Wislane'],
+  'Tétouan': ['Azla','Centre-ville','Dersa','El Irfane','Fnideq','Hay Al Amal','Hay Jamâa','Martil','Médina',"M'diq",'Quartier Espagnol','Sania Ramel','Sidi Al Mandri'],
+  'Oujda': ['Al Qods','Angad','Basatine','Bni Drar','Boudir','Centre-ville','Hay Al Qods','Hay El Fath','Hay Salam','Isly','Lazaret','Médina','Sidi Maafa','Sidi Moussa'],
+  'Kénitra': ['Ancien Kénitra','Bassatine','Belle Vue','Bouknadel','Centre-ville','Hay Amal','Hay Salam','Hay Wahda','Médina','Saknia','Sebou','Sidi Taibi'],
+  'El Jadida': ['Azemmour','Centre-ville','Haouzia','Hay El Amal','Hay Mohammadi','Médina','Sidi Bouzid','Sidi Moussa'],
+  'Safi': ['Amalou','Centre-ville','El Arba','Hay Ennahda','Hay Essalam','Lamharza','Médina','Sidi Bouzid'],
+  'Nador': ['Arkmane','Ben Enzar','Centre-ville','Hay Salam','Kariat Arkmane','Médina','Selouan','Zeghanghane'],
+  'Beni Mellal': ['Ain Asserdoune','Centre-ville','El Kasba','Hay Al Wifaq','Hay El Amal','Hay Essalam','Hay Ziane'],
+  'Settat': ['Centre-ville','El Borouj','Guisser','Hay Al Amane','Hay Essalam'],
+  'Mohammedia': ['Aïn Harrouda','Centre-ville','Cité OCP','Hay Ennakhil','Hay Lalla Aicha','Sahel'],
+  'Laâyoune': ['Centre-ville','Cité des PTT','El Marsa','Hay Maâta','Hay Waha','Laâyoune Plage'],
+  'Khouribga': ['Centre-ville','Cité OCP','Hay Al Amal','Hay Elkods','Hay Salam'],
+  'Ouarzazate': ['Aït Ben Haddou','Centre-ville','Hay Salam','Sidi Daoud','Tabounte'],
+  'Taza': ['Bab Marzouka','Centre-ville','Hay El Bader','Hay Essalam','Médina'],
+  'Berrechid': ['Centre-ville','Hay Salam','Hay Al Farah'],
+  'Khémisset': ['Centre-ville','Hay El Amal','Hay Salam'],
+  'Al Hoceima': ['Ait Youssef Ou Ali','Centre-ville','Hay Salam','Imzouren'],
+  'Larache': ['Centre-ville','Hay El Amal','Hay Salam','Ksar El Kebir','Médina'],
+  'Taroudant': ['Centre-ville','Hay Salam','Médina'],
+  'Tiznit': ['Centre-ville','Hay Salam','Médina'],
+  'Dakhla': ['Centre-ville','Hay Al Wahda','Port','Ville Haute'],
+  'Chefchaouen': ['Centre-ville','Hay Salam','Médina'],
+  'Berkane': ['Centre-ville','Hay Salam','Médina','Saidia'],
+  'Errachidia': ['Centre-ville','Hay Errachidia','Hay Salam'],
+  'Guelmim': ['Centre-ville','Hay Salam','Tiglit'],
+  'Autre': ["Autre quartier / Préciser dans l'adresse"],
+};
+
 type AppliedPromo = {
   code: string;
   label: string;
@@ -94,12 +136,14 @@ export default function CheckoutPage() {
     setPromoStatus('idle');
   };
 
+  const quartiers = form.customer_city ? (MOROCCO_CITIES[form.customer_city] || []) : [];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (items.length === 0) {
-      setErrorMsg('Veuillez sélectionner au moins un produit.');
-      return;
-    }
+    if (items.length === 0) { setErrorMsg('Veuillez sélectionner au moins un produit.'); return; }
+    if (!isValidPhone(form.customer_phone)) { setErrorMsg('Numéro de téléphone invalide (ex: 06 12 34 56 78)'); return; }
+    if (!form.customer_city) { setErrorMsg('Veuillez sélectionner votre ville.'); return; }
+    if (!form.customer_quartier) { setErrorMsg('Veuillez sélectionner votre quartier.'); return; }
     setStatus('loading');
     setErrorMsg('');
 
@@ -108,7 +152,10 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
-          ...form,
+          customer_name: sanitizeName(form.customer_name),
+          customer_phone: sanitizePhone(form.customer_phone),
+          customer_city: form.customer_city,
+          customer_quartier: form.customer_quartier,
           promo_code: appliedPromo?.code ?? (promoCode.trim() || undefined),
           items: items.map((i) => ({
             variant_id: i.variantId,
@@ -158,12 +205,9 @@ export default function CheckoutPage() {
     );
   }
 
-  const formFields = [
-    { id: 'customer_name', label: 'Nom complet *', placeholder: 'Ahmed Taaouati', type: 'text' },
-    { id: 'customer_phone', label: 'Téléphone *', placeholder: '06 61 23 45 67', type: 'tel' },
-    { id: 'customer_city', label: 'Ville *', placeholder: 'Tanger', type: 'text' },
-    { id: 'customer_quartier', label: 'Quartier *', placeholder: 'Malabata, Centre-ville...', type: 'text' },
-  ] as const;
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '14px 16px', borderRadius: '12px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)'}`, background: isLight ? '#FFFFFF' : '#0D0D0F', color: isLight ? '#111827' : '#F2EDE2', outline: 'none', fontSize: '0.85rem', transition: 'border-color 300ms ease', boxSizing: 'border-box' as const };
+  const selectStyle: React.CSSProperties = { ...inputStyle, appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23CA8A04' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '40px', cursor: 'pointer' };
+  const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.725rem', color: isLight ? '#44403C' : '#A8A29E', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' };
 
   return (
     <main style={{ minHeight: '100dvh', background: isLight ? '#FFFFFF' : '#0D0D0F', padding: '40px 24px 80px', transition: 'all 500ms' }}>
@@ -249,12 +293,36 @@ export default function CheckoutPage() {
           <div style={{ width: '40px', height: '2px', background: '#CA8A04', marginBottom: '28px' }} />
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {formFields.map(({ id, label, placeholder, type }) => (
-              <div key={id}>
-                <label htmlFor={id} style={{ display: 'block', fontSize: '0.725rem', color: isLight ? '#44403C' : '#A8A29E', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</label>
-                <input id={id} type={type} required placeholder={placeholder} style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, background: isLight ? '#FFFFFF' : '#0D0D0F', color: isLight ? '#111827' : '#F2EDE2', outline: 'none', fontSize: '0.85rem', transition: 'border-color 300ms ease' }} value={form[id as keyof typeof form]} onChange={(e) => setForm((f) => ({ ...f, [id]: e.target.value }))} />
-              </div>
-            ))}
+            {/* Nom */}
+            <div>
+              <label htmlFor="customer_name" style={labelStyle}>Nom complet *</label>
+              <input id="customer_name" type="text" required maxLength={100} placeholder="Ahmed Taaouati" style={inputStyle} value={form.customer_name} onChange={(e) => setForm((f) => ({ ...f, customer_name: sanitizeName(e.target.value) }))} />
+            </div>
+            {/* Téléphone */}
+            <div>
+              <label htmlFor="customer_phone" style={labelStyle}>Téléphone *</label>
+              <input id="customer_phone" type="tel" required maxLength={20} placeholder="06 61 23 45 67" style={inputStyle} value={form.customer_phone} onChange={(e) => setForm((f) => ({ ...f, customer_phone: sanitizePhone(e.target.value) }))} />
+            </div>
+            {/* Ville */}
+            <div>
+              <label htmlFor="customer_city" style={labelStyle}>Ville *</label>
+              <select id="customer_city" required value={form.customer_city} onChange={(e) => setForm((f) => ({ ...f, customer_city: e.target.value, customer_quartier: '' }))} style={selectStyle}>
+                <option value="" disabled style={{ background: '#1C1917', color: '#888' }}>Sélectionner votre ville</option>
+                {Object.keys(MOROCCO_CITIES).map((city) => (
+                  <option key={city} value={city} style={{ background: '#1C1917', color: '#F2EDE2' }}>{city}</option>
+                ))}
+              </select>
+            </div>
+            {/* Quartier */}
+            <div>
+              <label htmlFor="customer_quartier" style={labelStyle}>Quartier *</label>
+              <select id="customer_quartier" required value={form.customer_quartier} disabled={!form.customer_city} onChange={(e) => setForm((f) => ({ ...f, customer_quartier: e.target.value }))} style={{ ...selectStyle, opacity: form.customer_city ? 1 : 0.5, cursor: form.customer_city ? 'pointer' : 'not-allowed' }}>
+                <option value="" disabled style={{ background: '#1C1917', color: '#888' }}>{form.customer_city ? 'Sélectionner votre quartier' : "Choisissez d'abord une ville"}</option>
+                {quartiers.map((q: string) => (
+                  <option key={q} value={q} style={{ background: '#1C1917', color: '#F2EDE2' }}>{q}</option>
+                ))}
+              </select>
+            </div>
 
             <AnimatePresence>
               {(status === 'error' || errorMsg) && (
