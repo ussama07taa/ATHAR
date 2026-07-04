@@ -24,9 +24,12 @@ function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
 
+  // True if every variant has stock === 0
+  const isOutOfStock = product.variants.length > 0 && product.variants.every(v => v.stock === 0);
+
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!selected) return;
+    if (!selected || isOutOfStock) return;
     addItem({
       variantId: selected.id,
       sku: selected.sku,
@@ -63,40 +66,71 @@ function ProductCard({ product }: { product: Product }) {
             style={{ 
               objectFit: 'cover',
               transition: 'transform 500ms ease',
+              opacity: isOutOfStock ? 0.45 : 1,
             }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseOver={(e) => { if (!isOutOfStock) e.currentTarget.style.transform = 'scale(1.05)'; }}
             onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           />
         ) : (
           <div className="theme-bg-card" style={{ width: '100%', height: '100%' }} />
         )}
-        
-        {/* Quick Add Button */}
-        <button
-          onClick={handleAdd}
-          className="theme-border"
-          style={{
+
+        {/* Rupture de stock overlay */}
+        {isOutOfStock && (
+          <div style={{
             position: 'absolute',
-            bottom: '12px',
-            right: '12px',
-            width: '32px',
-            height: '32px',
-            borderRadius: '4px',
-            background: isLight ? '#FFFFFF' : '#0C0A09',
-            border: '1px solid',
-            fontSize: '1.2rem',
-            fontWeight: 300,
-            color: isLight ? '#111827' : '#F2EDE2',
-            cursor: 'pointer',
+            inset: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            zIndex: 2
-          }}
-        >
-          +
-        </button>
+            background: isLight ? 'rgba(255,255,255,0.38)' : 'rgba(0,0,0,0.38)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 5,
+          }}>
+            <span style={{
+              fontSize: '0.5rem',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: isLight ? '#1C1917' : '#F2EDE2',
+              background: isLight ? 'rgba(255,255,255,0.92)' : 'rgba(15,15,15,0.88)',
+              border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)'}`,
+              padding: '5px 12px',
+              borderRadius: '20px',
+            }}>
+              RUPTURE DE STOCK
+            </span>
+          </div>
+        )}
+
+        {/* Quick Add Button — hidden when out of stock */}
+        {!isOutOfStock && (
+          <button
+            onClick={handleAdd}
+            className="theme-border"
+            style={{
+              position: 'absolute',
+              bottom: '12px',
+              right: '12px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '4px',
+              background: isLight ? '#FFFFFF' : '#0C0A09',
+              border: '1px solid',
+              fontSize: '1.2rem',
+              fontWeight: 300,
+              color: isLight ? '#111827' : '#F2EDE2',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              zIndex: 2
+            }}
+          >
+            +
+          </button>
+        )}
       </div>
 
       {/* Product Info */}
@@ -110,13 +144,15 @@ function ProductCard({ product }: { product: Product }) {
         }}>
           {product.name}
         </h3>
-        <p className="theme-text" style={{
-          margin: 0,
-          fontSize: '0.82rem',
-          fontWeight: 600,
-        }}>
-          {selected ? `${parseFloat(selected.price).toFixed(2)} dh` : ''}
-        </p>
+        {isOutOfStock ? (
+          <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: isLight ? '#C0BFBD' : '#5C5C5C' }}>
+            Épuisé
+          </p>
+        ) : (
+          <p className="theme-text" style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600 }}>
+            {selected ? `${parseFloat(selected.price).toFixed(2)} dh` : ''}
+          </p>
+        )}
       </div>
     </article>
   );
