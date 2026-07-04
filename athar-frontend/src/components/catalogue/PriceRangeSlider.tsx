@@ -1,5 +1,8 @@
 'use client';
 
+import { useTheme } from 'next-themes';
+import { useState, useEffect } from 'react';
+
 interface PriceRangeSliderProps {
   min: number;
   max: number;
@@ -19,6 +22,11 @@ export default function PriceRangeSlider({
   valueMax,
   onChange,
 }: PriceRangeSliderProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const isLight = !mounted || resolvedTheme === 'light';
+
   const isSinglePrice = min >= max;
   const safeMin = Math.min(valueMin, valueMax);
   const safeMax = Math.max(valueMin, valueMax);
@@ -28,7 +36,7 @@ export default function PriceRangeSlider({
 
   if (isSinglePrice) {
     return (
-      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0C0A09', margin: '10px 0' }}>
+      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: isLight ? '#0C0A09' : '#F2EDE2', margin: '10px 0' }}>
         {formatPrice(min)} DH
       </p>
     );
@@ -39,7 +47,7 @@ export default function PriceRangeSlider({
       <div style={{ 
         position: 'relative', 
         height: '2px', 
-        background: '#eee', 
+        background: isLight ? '#eee' : 'rgba(255,255,255,0.1)', 
         borderRadius: '2px',
         marginBottom: '20px'
       }}>
@@ -86,7 +94,7 @@ export default function PriceRangeSlider({
           }}
         />
       </div>
-      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#57534E', letterSpacing: '0.02em', marginTop: 12 }}>
+      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: isLight ? '#57534E' : '#A8A29E', letterSpacing: '0.02em', marginTop: 12 }}>
         {formatPrice(safeMin)} DH — {formatPrice(safeMax)} DH
       </p>
 
@@ -97,7 +105,7 @@ export default function PriceRangeSlider({
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: #fff;
+          background: ${isLight ? '#fff' : '#1C1917'};
           border: 2px solid #CA8A04;
           cursor: pointer;
           box-shadow: 0 2px 6px rgba(202,138,4,0.15);
@@ -111,7 +119,7 @@ export default function PriceRangeSlider({
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: #fff;
+          background: ${isLight ? '#fff' : '#1C1917'};
           border: 2px solid #CA8A04;
           cursor: pointer;
         }

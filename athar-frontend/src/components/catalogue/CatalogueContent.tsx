@@ -8,6 +8,8 @@ import MobileFilterDrawer from '@/components/catalogue/MobileFilterDrawer';
 import { Product } from '@/types/product';
 import { LayoutGrid, Grid3X3, List, ChevronDown } from 'lucide-react';
 
+import { useTheme } from 'next-themes';
+
 interface CatalogueContentProps {
   initialProducts?: Product[];
   initialFilters?: { brands: string[]; sizes: string[] };
@@ -25,6 +27,10 @@ export default function CatalogueContent({
   isArabic = false,
   isDecant = false
 }: CatalogueContentProps) {
+  const { resolvedTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = useState(false);
+  useEffect(() => { setThemeMounted(true); }, []);
+  const isLight = !themeMounted || resolvedTheme === 'light';
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -172,10 +178,10 @@ export default function CatalogueContent({
 
   return (
     <div style={{ 
-      background: isNiche ? '#FCFBFA' : '#fff', 
+      background: isLight ? (isNiche ? '#FCFBFA' : '#fff') : '#0D0D0F', 
       minHeight: '100vh', 
       paddingTop: '20px',
-      color: '#1C1917',
+      color: isLight ? '#1C1917' : '#F2EDE2',
       transition: 'background 500ms ease'
     }}>
       
@@ -209,9 +215,13 @@ export default function CatalogueContent({
           font-weight: 600;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #1C1917;
+          color: ${isLight ? '#1C1917' : '#F2EDE2'};
           cursor: pointer;
           padding-right: 20px;
+        }
+        .sort-select option {
+          background: ${isLight ? '#FFFFFF' : '#1C1917'};
+          color: ${isLight ? '#1C1917' : '#F2EDE2'};
         }
       `}</style>
 
@@ -230,21 +240,21 @@ export default function CatalogueContent({
             alignItems: 'center', 
             justifyContent: 'space-between',
             padding: '12px 0',
-            borderBottom: `1px solid ${isNiche ? 'rgba(202,138,4,0.1)' : '#f0f0f0'}`,
+            borderBottom: `1px solid ${isLight ? (isNiche ? 'rgba(202,138,4,0.1)' : '#f0f0f0') : 'rgba(255,255,255,0.05)'}`,
             marginBottom: '10px',
             position: 'relative'
           }}>
             {/* Left: View Switches & Mobile Filter Toggle */}
             <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-              <div style={{ display: 'flex', gap: 10, color: '#ccc' }} className="desktop-only">
+              <div style={{ display: 'flex', gap: 10, color: isLight ? '#ccc' : '#444' }} className="desktop-only">
                 <LayoutGrid 
                   size={18} 
-                  style={{ cursor: 'pointer', color: viewMode === 'grid4' ? '#111' : '#ccc' }} 
+                  style={{ cursor: 'pointer', color: viewMode === 'grid4' ? (isLight ? '#111' : '#fff') : (isLight ? '#ccc' : '#444') }} 
                   onClick={() => setViewMode('grid4')}
                 />
                 <Grid3X3 
                   size={18} 
-                  style={{ cursor: 'pointer', color: viewMode === 'grid2' ? '#111' : '#ccc' }} 
+                  style={{ cursor: 'pointer', color: viewMode === 'grid2' ? (isLight ? '#111' : '#fff') : (isLight ? '#ccc' : '#444') }} 
                   onClick={() => setViewMode('grid2')}
                 />
               </div>

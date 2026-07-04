@@ -13,8 +13,10 @@ interface Props {
 export default function ProductDetail({ product }: Props) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  // Force Light Luxury theme for products so they never mismatch with the global bright header.
-  const isLight = true;
+  
+  useEffect(() => { setMounted(true); }, []);
+  
+  const isLight = !mounted || resolvedTheme === 'light';
 
   const [selected, setSelected] = useState<ProductVariant>(product.variants[0]);
   const [quantity, setQuantity] = useState(1);

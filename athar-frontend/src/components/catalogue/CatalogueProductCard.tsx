@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import useCartStore from '@/store/cartStore';
 import { Product, ProductVariant } from '@/types/product';
 import Image from 'next/image';
+import { useTheme } from 'next-themes';
 
 interface CatalogueProductCardProps {
   product: Product;
@@ -13,6 +14,11 @@ interface CatalogueProductCardProps {
 }
 
 export default function CatalogueProductCard({ product, priority = false, isNiche = false }: CatalogueProductCardProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const isLight = !mounted || resolvedTheme === 'light';
+
   const [selected] = useState<ProductVariant | undefined>(product.variants[0]);
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
@@ -45,11 +51,11 @@ export default function CatalogueProductCard({ product, priority = false, isNich
           position: 'relative',
           width: '100%',
           aspectRatio: '1 / 1',
-          background: isNiche ? '#FDFBF7' : '#F9F8F6',
+          background: isLight ? (isNiche ? '#FDFBF7' : '#F9F8F6') : '#1C1917',
           overflow: 'hidden',
           marginBottom: '20px',
           borderRadius: '16px',
-          border: isNiche ? '1px solid rgba(202, 138, 4, 0.2)' : 'none',
+          border: isNiche ? `1px solid ${isLight ? 'rgba(202, 138, 4, 0.2)' : 'rgba(202, 138, 4, 0.4)'}` : `1px solid ${isLight ? 'transparent' : 'rgba(255,255,255,0.05)'}`,
           boxShadow: isNiche ? '0 10px 40px -10px rgba(202, 138, 4, 0.1)' : 'none'
         }}>
           {product.image_url ? (
@@ -66,7 +72,7 @@ export default function CatalogueProductCard({ product, priority = false, isNich
               className="hover-zoom"
             />
           ) : (
-            <div style={{ width: '100%', height: '100%', background: '#f5f5f5' }} />
+            <div style={{ width: '100%', height: '100%', background: isLight ? '#f5f5f5' : '#1C1917' }} />
           )}
 
           {/* Dynamic Promo Badge */}
@@ -154,7 +160,7 @@ export default function CatalogueProductCard({ product, priority = false, isNich
           font-size: 0.85rem;
           font-family: var(--font-display);
           font-weight: 600;
-          color: #0C0A09;
+          color: ${isLight ? '#0C0A09' : '#F2EDE2'};
           text-transform: ${isNiche ? 'uppercase' : 'capitalize'};
           letter-spacing: ${isNiche ? '0.08em' : '0.01em'};
           line-height: 1.2;
@@ -163,15 +169,15 @@ export default function CatalogueProductCard({ product, priority = false, isNich
           margin: 0;
           font-size: 0.8rem;
           font-family: ui-sans-serif, system-ui, sans-serif;
-          color: ${isNiche ? '#D4AF37' : '#6B6654'};
+          color: ${isLight ? (isNiche ? '#D4AF37' : '#6B6654') : (isNiche ? '#EAB308' : '#A8A29E')};
           font-weight: 700;
           letter-spacing: 0.05em;
         }
         .prod-pack-label {
           font-size: 0.6rem;
-          color: #111;
+          color: ${isLight ? '#111' : '#DDD'};
           font-weight: 700;
-          border-bottom: 1px solid #111;
+          border-bottom: 1px solid ${isLight ? '#111' : '#DDD'};
         }
         .prod-pack-badge {
           font-size: 0.55rem;

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import PriceRangeSlider from '@/components/catalogue/PriceRangeSlider';
+import { useTheme } from 'next-themes';
 
 interface FilterSectionProps {
   title: string;
@@ -14,9 +15,11 @@ interface FilterSectionProps {
 
 function FilterSection({ title, defaultOpen = false, activeCount = 0, isNiche = false, children }: FilterSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme !== 'dark';
 
   return (
-    <div style={{ borderBottom: '1px solid #f5f5f5' }}>
+    <div style={{ borderBottom: `1px solid ${isLight ? '#f5f5f5' : 'rgba(255,255,255,0.05)'}` }}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -38,7 +41,7 @@ function FilterSection({ title, defaultOpen = false, activeCount = 0, isNiche = 
             fontWeight: 700,
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            color: '#1C1917'
+            color: isLight ? '#1C1917' : '#F2EDE2'
           }}>
             {title}
           </span>
@@ -114,6 +117,9 @@ export function FilterPanel({
   showHeader = true,
   isNiche = false,
 }: CatalogueFiltersProps) {
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme !== 'dark';
+
   const hasActiveFilters =
     !!selectedBrand ||
     !!selectedSize ||
@@ -126,7 +132,7 @@ export function FilterPanel({
     textAlign: 'left' as const,
     padding: '10px 0',
     fontSize: '0.8rem',
-    color: active ? (isNiche ? '#D4AF37' : '#CA8A04') : '#57534E',
+    color: active ? (isNiche ? '#D4AF37' : '#CA8A04') : (isLight ? '#57534E' : '#A8A29E'),
     fontWeight: active ? 600 : 400,
     background: 'none',
     border: 'none',
@@ -140,9 +146,9 @@ export function FilterPanel({
     borderRadius: '10px',
     border: active 
       ? `1.5px solid ${isNiche ? '#D4AF37' : '#CA8A04'}` 
-      : '1px solid #E7E5E4',
-    background: active ? (isNiche ? '#D4AF37' : '#CA8A04') : '#FFFFFF',
-    color: active ? '#FFFFFF' : '#44403C',
+      : `1px solid ${isLight ? '#E7E5E4' : 'rgba(255,255,255,0.1)'}`,
+    background: active ? (isNiche ? '#D4AF37' : '#CA8A04') : (isLight ? '#FFFFFF' : '#1C1917'),
+    color: active ? '#FFFFFF' : (isLight ? '#44403C' : '#F2EDE2'),
     cursor: 'pointer',
     fontWeight: active ? 600 : 500,
     transition: 'all 250ms ease'
@@ -157,9 +163,9 @@ export function FilterPanel({
           justifyContent: 'space-between', 
           marginBottom: '20px',
           paddingBottom: '10px',
-          borderBottom: '1px solid #1C1917' 
+          borderBottom: `1px solid ${isLight ? '#1C1917' : 'rgba(255,255,255,0.1)'}` 
         }}>
-          <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: 0, color: '#1C1917' }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', margin: 0, color: isLight ? '#1C1917' : '#F2EDE2' }}>
             FILTRES
           </p>
           {hasActiveFilters && onClearAll && (
