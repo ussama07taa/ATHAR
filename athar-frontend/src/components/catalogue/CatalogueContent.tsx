@@ -307,7 +307,7 @@ export default function CatalogueContent({
             justifyContent: 'center', 
             gap: 20, 
             marginBottom: 20,
-            borderBottom: '1px solid #f0f0f0',
+            borderBottom: `1px solid ${isLight ? '#f0f0f0' : 'rgba(255,255,255,0.05)'}`,
             paddingBottom: 15
           }}>
             {[
@@ -332,7 +332,7 @@ export default function CatalogueContent({
                     fontFamily: 'var(--font-display)',
                     fontWeight: 700,
                     letterSpacing: '0.1em',
-                    color: isActive ? '#111' : '#999',
+                    color: isActive ? (isLight ? '#111' : '#F2EDE2') : (isLight ? '#999' : '#78716C'),
                     cursor: 'pointer',
                     position: 'relative',
                     padding: '0 5px 10px',
@@ -347,7 +347,7 @@ export default function CatalogueContent({
                       left: 0, 
                       right: 0, 
                       height: 2, 
-                      background: '#111' 
+                      background: isLight ? '#111' : '#F2EDE2' 
                     }} />
                   )}
                 </button>
