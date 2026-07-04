@@ -288,7 +288,7 @@ export default function ProductDetail({ product }: Props) {
       </div>
 
       {/* ── MOBILE: Info section ── */}
-      <div className="pd-mobile-img" style={{ padding: '28px 20px 80px', maxWidth: 600, margin: '0 auto' }}>
+      <div className="pd-mobile-img" style={{ padding: '28px 20px 140px', maxWidth: 600, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <p style={{ fontSize: '0.68rem', color: '#CA8A04', letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 8px', fontWeight: 700 }}>
             {product.category?.name || 'EAU DE PARFUM'}
@@ -322,7 +322,7 @@ export default function ProductDetail({ product }: Props) {
         style={{
           maxWidth: 1200,
           margin: '0 auto',
-          padding: '40px 40px 100px',
+          padding: '40px 40px 140px',
           gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)',
           gap: '80px',
           alignItems: 'start',
