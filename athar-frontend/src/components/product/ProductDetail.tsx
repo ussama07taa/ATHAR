@@ -209,6 +209,28 @@ export default function ProductDetail({ product }: Props) {
         background: isLight ? '#F5F5F4' : '#1C1917',
         overflow: 'hidden',
       }}>
+        {product.badge_label && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: product.badge_color || 'linear-gradient(135deg, #C8A25C, #9B7A3D)',
+            color: '#ffffff',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            padding: '6px 16px',
+            borderRadius: '0 0 12px 12px',
+            letterSpacing: '0.05em',
+            zIndex: 10,
+            boxShadow: `0 4px 12px ${product.badge_color || '#C8A25C'}4D`,
+            textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderTop: 'none',
+          }}>
+            {product.badge_label}
+          </div>
+        )}
         <div style={{
           position: 'absolute',
           top: 20,
@@ -315,6 +337,28 @@ export default function ProductDetail({ product }: Props) {
           borderRadius: 8,
           border: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`
         }}>
+          {product.badge_label && (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: product.badge_color || 'linear-gradient(135deg, #C8A25C, #9B7A3D)',
+              color: '#ffffff',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              padding: '6px 20px',
+              borderRadius: '0 0 14px 14px',
+              letterSpacing: '0.05em',
+              zIndex: 10,
+              boxShadow: `0 4px 12px ${product.badge_color || '#C8A25C'}4D`,
+              textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderTop: 'none',
+            }}>
+              {product.badge_label}
+            </div>
+          )}
           {mainImage ? (
             <Image
               src={mainImage}
