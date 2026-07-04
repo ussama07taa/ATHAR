@@ -162,27 +162,14 @@ export default function Header({ initialMenuData }: { initialMenuData?: MenuCate
             animate={{ opacity: 1, y: 0 }}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
-            <span style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.9rem',
-              fontWeight: 700,
-              color: '#CA8A04',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              lineHeight: 0.9
-            }}>
-              Athar
-            </span>
-            <span style={{
-              fontSize: '0.55rem',
-              fontWeight: 500,
-              color: '#A16207',
-              letterSpacing: '0.4em',
-              textTransform: 'uppercase',
-              marginTop: 6
-            }}>
-              Maison de Parfums
-            </span>
+            <Image 
+              src="/logo.png" 
+              alt="Athar Maison de Parfums" 
+              width={90} 
+              height={120} 
+              style={{ objectFit: 'contain', filter: isLight ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.05))' : 'drop-shadow(0 4px 10px rgba(202,138,4,0.15))' }}
+              priority
+            />
           </motion.div>
         </Link>
 
