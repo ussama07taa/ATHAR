@@ -418,6 +418,7 @@ export default function ProductDetail({ product }: Props) {
           .sticky-cta {
             display: flex;
           }
+          ${showStickyBar ? '#whatsapp-widget { bottom: 96px !important; }' : ''}
         }
       `}</style>
       <div
