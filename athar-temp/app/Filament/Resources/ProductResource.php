@@ -453,7 +453,7 @@ class ProductResource extends Resource
     protected static function getGenderOptions(): array
     {
         return Category::query()
-            ->whereIn('slug', ['femmes', 'hommes'])
+            ->whereIn('slug', ['femmes', 'hommes', 'unisex'])
             ->orderBy('sort_order')
             ->get()
             ->mapWithKeys(fn (Category $cat) => [(string) $cat->id => $cat->name])

@@ -132,10 +132,12 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
   const isLight = mounted && resolvedTheme === 'light';
 
   const hommeProducts = products.filter(p =>
+    p.gender === 'homme' || p.gender === 'unisex' ||
     p.category?.slug?.toLowerCase().includes('homme') ||
     p.category?.name?.toLowerCase().includes('homme')
   );
   const femmeProducts = products.filter(p =>
+    p.gender === 'femme' || p.gender === 'unisex' ||
     p.category?.slug?.toLowerCase().includes('femme') ||
     p.category?.name?.toLowerCase().includes('femme')
   );
