@@ -279,6 +279,13 @@ class OrderResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('print_labels')
+                        ->label('Imprimer Étiquettes')
+                        ->icon('heroicon-o-printer')
+                        ->color('info')
+                        ->action(fn (\Illuminate\Database\Eloquent\Collection $records) => 
+                            redirect()->route('orders.print-bulk', ['ids' => $records->pluck('id')->implode(',')])
+                        ),
                 ]),
             ]);
     }

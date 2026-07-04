@@ -17,6 +17,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/admin/orders/print-bulk', \App\Http\Controllers\OrderBulkPrintController::class)
+    ->name('orders.print-bulk')
+    ->middleware(['web', 'auth']);
+
 Route::get('/admin/orders/{order}/print', \App\Http\Controllers\OrderPrintController::class)
     ->name('orders.print')
     ->middleware(['web', 'auth']);

@@ -93,6 +93,10 @@
     <div class="section">
         <div class="label">Ville de Livraison</div>
         <div class="value">{{ $order->customer_city }}</div>
+        @if($order->customer_quartier)
+            <div class="label" style="margin-top: 2mm;">Quartier</div>
+            <div class="value">{{ $order->customer_quartier }}</div>
+        @endif
     </div>
 
     <div class="section">
