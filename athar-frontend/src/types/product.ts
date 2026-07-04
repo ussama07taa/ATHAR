@@ -25,6 +25,9 @@ export interface Product {
   is_custom_pack: boolean;
   pack_slots?: number;
   is_niche: boolean;
+  is_arabic: boolean;
+  is_new_arrival: boolean;
+  is_best_seller: boolean;
   gender: 'homme' | 'femme' | 'unisex';
   badge_label?: string;
   badge_color?: string;

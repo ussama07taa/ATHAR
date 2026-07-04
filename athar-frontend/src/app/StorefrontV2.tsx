@@ -134,13 +134,17 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
   const isLight = mounted && resolvedTheme === 'light';
 
   // Filters
-  const nouveautes = products.slice(0, 4); // Simulate new arrivals
-  
-  const orientalProducts = products.filter(p => 
+  const nouveautes = products.filter(p => p.is_new_arrival).slice(0, 4);
+  const fallbackNouveautes = products.slice(0, 4); // In case they haven't set any up yet
+  const displayedNouveautes = nouveautes.length > 0 ? nouveautes : fallbackNouveautes;
+
+  const orientalProducts = products.filter(p => p.is_arabic).slice(0, 4);
+  const fallbackOriental = products.filter(p => 
     p.category?.slug?.toLowerCase().includes('arabic') || 
     p.name.toLowerCase().includes('oud') ||
     p.name.toLowerCase().includes('musc')
   ).slice(0, 4);
+  const displayedOriental = orientalProducts.length > 0 ? orientalProducts : fallbackOriental;
 
   const hommeProducts = products.filter(p =>
     p.gender === 'homme' || p.gender === 'unisex' ||
@@ -154,9 +158,11 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
     p.category?.name?.toLowerCase().includes('femme')
   );
 
-  let displayedProducts = products;
-  if (activeTab === 'homme') displayedProducts = hommeProducts;
-  if (activeTab === 'femme') displayedProducts = femmeProducts;
+  let displayedProducts = products.filter(p => p.is_best_seller);
+  if (displayedProducts.length === 0) displayedProducts = products; // Fallback to all products if no best sellers defined
+
+  if (activeTab === 'homme') displayedProducts = displayedProducts.filter(p => hommeProducts.includes(p));
+  if (activeTab === 'femme') displayedProducts = displayedProducts.filter(p => femmeProducts.includes(p));
   
   // Limiting displayed to 8 for the grid to keep it clean, but showing more than 4
   const mainGridProducts = displayedProducts.slice(0, 8);
@@ -270,7 +276,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
       </div>
 
       {/* SECTION 1: NOUVEAUTÉS EXCLUSIVES */}
-      {nouveautes.length > 0 && (
+      {displayedNouveautes.length > 0 && (
         <div style={{ padding: '40px 0', borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <p style={{ margin: '0 0 10px', fontSize: '0.65rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#CA8A04', fontWeight: 700 }}>Découvrez nos derniers joyaux</p>
@@ -278,7 +284,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
           </div>
           
           <div className="product-grid">
-            {nouveautes.map((p) => (
+            {displayedNouveautes.map((p) => (
               <ProductCard key={`nouveau-${p.id}`} product={p} />
             ))}
           </div>
@@ -286,7 +292,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
       )}
 
       {/* SECTION 2: LA COLLECTION ORIENTALE (ARABIC) */}
-      {orientalProducts.length > 0 && (
+      {displayedOriental.length > 0 && (
         <div style={{ 
           margin: '60px 0', 
           background: isLight ? 'linear-gradient(to right, #FDFBF7, #F6F2EB)' : 'linear-gradient(to right, #110E0B, #1A1612)', 
@@ -312,7 +318,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
             </div>
 
             <div className="product-grid" style={{ width: '100%', padding: 0 }}>
-              {orientalProducts.map((p) => (
+              {displayedOriental.map((p) => (
                 <ProductCard key={`oriental-${p.id}`} product={p} />
               ))}
             </div>
