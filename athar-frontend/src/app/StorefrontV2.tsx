@@ -323,7 +323,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
               ))}
             </div>
 
-            <a href="/catalogue?category=arabic" style={{ marginTop: '40px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 36px', background: 'transparent', border: '1px solid #CA8A04', color: '#CA8A04', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms' }} onMouseOver={(e) => { e.currentTarget.style.background = '#CA8A04'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CA8A04'; }}>
+            <a href="/parfums-arabic" style={{ marginTop: '40px', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 36px', background: 'transparent', border: '1px solid #CA8A04', color: '#CA8A04', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', textDecoration: 'none', transition: 'all 300ms' }} onMouseOver={(e) => { e.currentTarget.style.background = '#CA8A04'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#CA8A04'; }}>
               Voir toute la collection Orientale
             </a>
           </div>
