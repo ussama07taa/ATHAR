@@ -190,7 +190,12 @@ export default function ProductDetail({ product }: Props) {
   );
 
   return (
-    <div>
+    <div style={{ 
+      background: isLight ? 'transparent' : '#0D0D0F', 
+      color: isLight ? 'inherit' : '#F2EDE2', 
+      minHeight: '100vh', 
+      transition: 'all 500ms ease' 
+    }}>
       <style>{`
         .pd-mobile-img { display: block; }
         .pd-desktop-layout { display: none; }
@@ -295,7 +300,7 @@ export default function ProductDetail({ product }: Props) {
           <p style={{ fontSize: '0.68rem', color: '#CA8A04', letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 8px', fontWeight: 700 }}>
             {product.category?.name || 'EAU DE PARFUM'}
           </p>
-          <h1 className="theme-title" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', fontWeight: 300, margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: 'var(--font-display)', lineHeight: 1.05 }}>
+          <h1 className="theme-title" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', color: isLight ? '#111827' : '#F2EDE2', fontWeight: 300, margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: 'var(--font-display)', lineHeight: 1.05 }}>
             {product.name}
           </h1>
           <div style={{ fontSize: '1.35rem', color: '#CA8A04', fontWeight: 600, fontFamily: 'var(--font-display)' }}>
@@ -390,7 +395,7 @@ export default function ProductDetail({ product }: Props) {
           <p style={{ fontSize: '0.68rem', color: '#CA8A04', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 10px', fontWeight: 700 }}>
             {product.category?.name || 'EAU DE PARFUM'}
           </p>
-          <h1 className="theme-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 4rem)', fontWeight: 300, margin: '0 0 16px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-display)', lineHeight: 1.05 }}>
+          <h1 className="theme-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 4rem)', color: isLight ? '#111827' : '#F2EDE2', fontWeight: 300, margin: '0 0 16px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-display)', lineHeight: 1.05 }}>
             {product.name}
           </h1>
           <div style={{ fontSize: '1.8rem', color: '#CA8A04', fontWeight: 600, fontFamily: 'var(--font-display)', marginBottom: 32 }}>
