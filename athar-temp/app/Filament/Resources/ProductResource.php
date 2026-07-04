@@ -88,6 +88,18 @@ class ProductResource extends Resource
                                             ->helperText('Cocher pour afficher dans la section Decantage.')
                                             ->default(false)
                                             ->inline(false),
+
+                                        Forms\Components\Toggle::make('is_new_arrival')
+                                            ->label('✨ Nouveauté Exclusive')
+                                            ->helperText('Afficher dans la section Nouveautés de l\'accueil.')
+                                            ->default(false)
+                                            ->inline(false),
+
+                                        Forms\Components\Toggle::make('is_best_seller')
+                                            ->label('🔥 Best Seller')
+                                            ->helperText('Afficher dans la section Best Sellers de l\'accueil.')
+                                            ->default(false)
+                                            ->inline(false),
                                     ])
                                     ->columnSpan(1),
                             ]),

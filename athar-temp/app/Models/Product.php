@@ -25,6 +25,8 @@ class Product extends Model
         'is_arabic',
         'is_decant',
         'is_active',
+        'is_new_arrival',
+        'is_best_seller',
         'image',
         'badge_label',
         'badge_color',
@@ -37,6 +39,8 @@ class Product extends Model
         'is_niche'       => 'boolean',
         'is_arabic'      => 'boolean',
         'is_decant'      => 'boolean',
+        'is_new_arrival' => 'boolean',
+        'is_best_seller' => 'boolean',
         'is_active'      => 'boolean',
         'gallery'        => 'array',
     ];
