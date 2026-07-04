@@ -45,7 +45,7 @@ export default function FloatingActions() {
   if (!mounted || isCartOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[1000] flex flex-col items-end gap-4">
+    <div className="fixed right-6 z-[1000] flex flex-col items-end gap-4 bottom-24 md:bottom-6">
       <style>{`
         @keyframes pulse-green {
           0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
