@@ -296,12 +296,12 @@ export default function CheckoutPage() {
             {/* Nom */}
             <div>
               <label htmlFor="customer_name" style={labelStyle}>Nom complet *</label>
-              <input id="customer_name" type="text" required maxLength={100} placeholder="Ahmed Taaouati" style={inputStyle} value={form.customer_name} onChange={(e) => setForm((f) => ({ ...f, customer_name: sanitizeName(e.target.value) }))} />
+              <input id="customer_name" type="text" required maxLength={100} placeholder="Votre nom complet" style={inputStyle} value={form.customer_name} onChange={(e) => setForm((f) => ({ ...f, customer_name: sanitizeName(e.target.value) }))} />
             </div>
             {/* Téléphone */}
             <div>
               <label htmlFor="customer_phone" style={labelStyle}>Téléphone *</label>
-              <input id="customer_phone" type="tel" required maxLength={20} placeholder="06 61 23 45 67" style={inputStyle} value={form.customer_phone} onChange={(e) => setForm((f) => ({ ...f, customer_phone: sanitizePhone(e.target.value) }))} />
+              <input id="customer_phone" type="tel" required maxLength={20} placeholder="06 XX XX XX XX" style={inputStyle} value={form.customer_phone} onChange={(e) => setForm((f) => ({ ...f, customer_phone: sanitizePhone(e.target.value) }))} />
             </div>
             {/* Ville */}
             <div>
