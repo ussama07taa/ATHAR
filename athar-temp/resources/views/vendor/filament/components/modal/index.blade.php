@@ -58,24 +58,18 @@
 
         close: function () {
             this.isOpen = false
-            this.$nextTick(() => {
-                if (this.$refs.modalContainer) {
-                    this.$refs.modalContainer.dispatchEvent(
-                        new CustomEvent('modal-closed', { id: '{{ $id }}' }),
-                    )
-                }
-            })
+
+            this.$refs.modalContainer?.dispatchEvent(
+                new CustomEvent('modal-closed', { id: '{{ $id }}' }),
+            )
         },
 
         open: function () {
             this.isOpen = true
-            this.$nextTick(() => {
-                if (this.$refs.modalContainer) {
-                    this.$refs.modalContainer.dispatchEvent(
-                        new CustomEvent('modal-opened', { id: '{{ $id }}' }),
-                    )
-                }
-            })
+
+            this.$refs.modalContainer?.dispatchEvent(
+                new CustomEvent('modal-opened', { id: '{{ $id }}' }),
+            )
         },
     }"
     @if ($id)

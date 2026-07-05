@@ -13,7 +13,11 @@ class EditOrder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\Action::make('deleteDirect')
+                ->label('Supprimer')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->url(fn (): string => route('orders.delete-direct', $this->record)),
         ];
     }
 }

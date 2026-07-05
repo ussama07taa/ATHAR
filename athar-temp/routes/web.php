@@ -21,6 +21,10 @@ Route::get('/admin/orders/print-bulk', \App\Http\Controllers\OrderBulkPrintContr
     ->name('orders.print-bulk')
     ->middleware(['web', 'auth']);
 
+Route::get('/admin/orders/{order}/delete-direct', \App\Http\Controllers\OrderDeleteController::class)
+    ->name('orders.delete-direct')
+    ->middleware(['web', 'auth']);
+
 Route::get('/admin/orders/{order}/print', \App\Http\Controllers\OrderPrintController::class)
     ->name('orders.print')
     ->middleware(['web', 'auth']);
