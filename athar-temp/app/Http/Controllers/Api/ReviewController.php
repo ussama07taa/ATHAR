@@ -56,9 +56,13 @@ class ReviewController extends Controller
         ]);
 
         Review::create([
-            ...$validated,
-            'is_approved' => false,
-            'is_featured' => false,
+            'product_id'    => $validated['product_id'] ?? null,
+            'customer_name' => strip_tags($validated['customer_name']),
+            'customer_city' => isset($validated['customer_city']) ? strip_tags($validated['customer_city']) : null,
+            'rating'        => $validated['rating'],
+            'comment'       => strip_tags($validated['comment']),
+            'is_approved'   => false,
+            'is_featured'   => false,
         ]);
 
         return response()->json([
