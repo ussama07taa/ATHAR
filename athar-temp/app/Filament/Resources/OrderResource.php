@@ -7,9 +7,11 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -272,13 +274,31 @@ class OrderResource extends Resource
                         ->color('info')
                         ->url(fn (Order $record): string => route('orders.print', $record))
                         ->openUrlInNewTab(),
+
+                    Tables\Actions\Action::make('deleteDirect')
+                        ->label('Supprimer')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->url(fn (Order $record): string => route('orders.delete-direct', $record)),
                     
                     Tables\Actions\EditAction::make(),
                 ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('deleteDirect')
+                        ->label('Supprimer')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Order $record) => $record->delete());
+
+                            Notification::make()
+                                ->title('Commandes supprimées')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     Tables\Actions\BulkAction::make('print_labels')
                         ->label('Imprimer Étiquettes')
                         ->icon('heroicon-o-printer')

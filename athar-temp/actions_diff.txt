@@ -1,0 +1,398 @@
+﻿diff --git "a/vendor\\filament\\actions\\resources\\views/badge-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/badge-action.blade.php"
+deleted file mode 100644
+index c620176..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/badge-action.blade.php"
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<x-filament-actions::action
+-    :action="$action"
+-    dynamic-component="filament::badge"
+-    :icon-position="$getIconPosition()"
+-    :size="$getSize()"
+-    class="fi-ac-badge-action"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::action>
+diff --git "a/vendor\\filament\\actions\\resources\\views/badge-group.blade.php" "b/vendor\\filament\\actions\\resources\\views/badge-group.blade.php"
+deleted file mode 100644
+index 6837446..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/badge-group.blade.php"
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<x-filament-actions::group
+-    dynamic-component="filament::badge"
+-    :group="$group"
+-    :icon-position="$getIconPosition()"
+-    :size="$getSize()"
+-    class="fi-ac-badge-group"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::group>
+diff --git "a/vendor\\filament\\actions\\resources\\views/button-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/button-action.blade.php"
+deleted file mode 100644
+index fda3793..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/button-action.blade.php"
++++ /dev/null
+@@ -1,13 +0,0 @@
+-<x-filament-actions::action
+-    :action="$action"
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::button"
+-    :icon-position="$getIconPosition()"
+-    :labeled-from="$getLabeledFromBreakpoint()"
+-    :outlined="$isOutlined()"
+-    :size="$getSize()"
+-    class="fi-ac-btn-action"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::action>
+diff --git "a/vendor\\filament\\actions\\resources\\views/button-group.blade.php" "b/vendor\\filament\\actions\\resources\\views/button-group.blade.php"
+deleted file mode 100644
+index b576144..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/button-group.blade.php"
++++ /dev/null
+@@ -1,13 +0,0 @@
+-<x-filament-actions::group
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::button"
+-    :group="$group"
+-    :icon-position="$getIconPosition()"
+-    :labeled-from="$getLabeledFromBreakpoint()"
+-    :outlined="$isOutlined()"
+-    :size="$getSize()"
+-    class="fi-ac-btn-group"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::group>
+diff --git "a/vendor\\filament\\actions\\resources\\views/components/action.blade.php" "b/vendor\\filament\\actions\\resources\\views/components/action.blade.php"
+deleted file mode 100644
+index 334d7a6..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/components/action.blade.php"
++++ /dev/null
+@@ -1,32 +0,0 @@
+-@props([
+-    'action',
+-    'dynamicComponent',
+-    'icon' => null,
+-])
+-
+-@php
+-    $isDisabled = $action->isDisabled();
+-    $url = $action->getUrl();
+-@endphp
+-
+-<x-dynamic-component
+-    :color="$action->getColor()"
+-    :component="$dynamicComponent"
+-    :disabled="$isDisabled"
+-    :form="$action->getFormToSubmit()"
+-    :href="$isDisabled ? null : $url"
+-    :icon="$icon ?? $action->getIcon()"
+-    :icon-size="$action->getIconSize()"
+-    :key-bindings="$action->getKeyBindings()"
+-    :label-sr-only="$action->isLabelHidden()"
+-    :tag="$url ? 'a' : 'button'"
+-    :target="($url && $action->shouldOpenUrlInNewTab()) ? '_blank' : null"
+-    :tooltip="$action->getTooltip()"
+-    :type="$action->canSubmitForm() ? 'submit' : 'button'"
+-    :wire:click="$action->getLivewireClickHandler()"
+-    :wire:target="$action->getLivewireTarget()"
+-    :x-on:click="$action->getAlpineClickHandler()"
+-    :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->merge($action->getExtraAttributes(), escape: false)"
+->
+-    {{ $slot }}
+-</x-dynamic-component>
+diff --git "a/vendor\\filament\\actions\\resources\\views/components/actions.blade.php" "b/vendor\\filament\\actions\\resources\\views/components/actions.blade.php"
+deleted file mode 100644
+index f5a0ad7..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/components/actions.blade.php"
++++ /dev/null
+@@ -1,3 +0,0 @@
+-<x-filament::actions
+-    :attributes="\Filament\Support\prepare_inherited_attributes($attributes)"
+-/>
+diff --git "a/vendor\\filament\\actions\\resources\\views/components/group.blade.php" "b/vendor\\filament\\actions\\resources\\views/components/group.blade.php"
+deleted file mode 100644
+index 74f300f..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/components/group.blade.php"
++++ /dev/null
+@@ -1,124 +0,0 @@
+-@props([
+-    'actions' => [],
+-    'badge' => null,
+-    'badgeColor' => null,
+-    'button' => false,
+-    'color' => null,
+-    'dropdownMaxHeight' => null,
+-    'dropdownOffset' => null,
+-    'dropdownPlacement' => null,
+-    'dropdownWidth' => null,
+-    'dynamicComponent' => null,
+-    'group' => null,
+-    'icon' => null,
+-    'iconPosition' => null,
+-    'iconSize' => null,
+-    'iconButton' => false,
+-    'label' => null,
+-    'link' => false,
+-    'size' => null,
+-    'tooltip' => null,
+-    'view' => null,
+-])
+-
+-@if (! ($dynamicComponent && $group))
+-    @php
+-        $group = \Filament\Actions\ActionGroup::make($actions)
+-            ->badgeColor($badgeColor)
+-            ->color($color)
+-            ->dropdownMaxHeight($dropdownMaxHeight)
+-            ->dropdownOffset($dropdownOffset)
+-            ->dropdownPlacement($dropdownPlacement)
+-            ->dropdownWidth($dropdownWidth)
+-            ->icon($icon)
+-            ->iconPosition($iconPosition)
+-            ->iconSize($iconSize)
+-            ->label($label)
+-            ->size($size)
+-            ->tooltip($tooltip)
+-            ->view($view);
+-
+-        $badge === true
+-            ? $group->badge()
+-            : $group->badge($badge);
+-
+-        if ($button) {
+-            $group->button();
+-        }
+-
+-        if ($iconButton) {
+-            $group->iconButton();
+-        }
+-
+-        if ($link) {
+-            $group->link();
+-        }
+-    @endphp
+-
+-    {{ $group }}
+-@elseif (! $group->hasDropdown())
+-    @foreach ($group->getActions() as $action)
+-        @if ($action->isVisible())
+-            {{ $action }}
+-        @endif
+-    @endforeach
+-@else
+-    @php
+-        $actionLists = [];
+-        $singleActions = [];
+-
+-        foreach ($group->getActions() as $action) {
+-            if ($action->isHidden()) {
+-                continue;
+-            }
+-
+-            if ($action instanceof \Filament\Actions\ActionGroup && (! $action->hasDropdown())) {
+-                if (count($singleActions)) {
+-                    $actionLists[] = $singleActions;
+-                    $singleActions = [];
+-                }
+-
+-                $actionLists[] = array_filter(
+-                    $action->getActions(),
+-                    fn ($action): bool => $action->isVisible(),
+-                );
+-            } else {
+-                $singleActions[] = $action;
+-            }
+-        }
+-
+-        if (count($singleActions)) {
+-            $actionLists[] = $singleActions;
+-        }
+-    @endphp
+-
+-    <x-filament::dropdown
+-        :max-height="$group->getDropdownMaxHeight()"
+-        :offset="$group->getDropdownOffset()"
+-        :placement="$group->getDropdownPlacement() ?? 'bottom-start'"
+-        :width="$group->getDropdownWidth()"
+-        teleport
+-    >
+-        <x-slot name="trigger">
+-            <x-dynamic-component
+-                :color="$group->getColor()"
+-                :component="$dynamicComponent"
+-                :icon="$group->getIcon()"
+-                :icon-size="$group->getIconSize()"
+-                :label-sr-only="$group->isLabelHidden()"
+-                :tooltip="$group->getTooltip()"
+-                :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->merge($group->getExtraAttributes(), escape: false)"
+-            >
+-                {{ $slot }}
+-            </x-dynamic-component>
+-        </x-slot>
+-
+-        @foreach ($actionLists as $actions)
+-            <x-filament::dropdown.list>
+-                @foreach ($actions as $action)
+-                    {{ $action }}
+-                @endforeach
+-            </x-filament::dropdown.list>
+-        @endforeach
+-    </x-filament::dropdown>
+-@endif
+diff --git "a/vendor\\filament\\actions\\resources\\views/components/modals.blade.php" "b/resources\\views\\vendor\\filament-actions/components/modals.blade.php"
+index 6e221d8..177c5e1 100644
+--- "a/vendor\\filament\\actions\\resources\\views/components/modals.blade.php"
++++ "b/resources\\views\\vendor\\filament-actions/components/modals.blade.php"
+@@ -190,7 +190,7 @@
+             :slide-over="$action?->isModalSlideOver()"
+             :sticky-footer="$action?->isModalFooterSticky()"
+             :sticky-header="$action?->isModalHeaderSticky()"
+-            :visible="filled($action)"
++            :visible="true"
+             :width="$action?->getModalWidth()"
+             :wire:key="$action ? $this->getId() . '.infolist.actions.' . $action->getName() . '.modal' : null"
+             x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedInfolistActions.length) open()"
+@@ -249,7 +249,7 @@
+             :slide-over="$action?->isModalSlideOver()"
+             :sticky-footer="$action?->isModalFooterSticky()"
+             :sticky-header="$action?->isModalHeaderSticky()"
+-            :visible="filled($action)"
++            :visible="true"
+             :width="$action?->getModalWidth()"
+             :wire:key="$action ? $this->getId() . '.' . $action->getComponent()->getStatePath() . '.actions.' . $action->getName() . '.modal' : null"
+             x-on:modal-closed.stop="
+diff --git "a/vendor\\filament\\actions\\resources\\views/grouped-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/grouped-action.blade.php"
+deleted file mode 100644
+index d5d401f..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/grouped-action.blade.php"
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<x-filament-actions::action
+-    :action="$action"
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::dropdown.list.item"
+-    :icon="$getGroupedIcon()"
+-    class="fi-ac-grouped-action"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::action>
+diff --git "a/vendor\\filament\\actions\\resources\\views/grouped-group.blade.php" "b/vendor\\filament\\actions\\resources\\views/grouped-group.blade.php"
+deleted file mode 100644
+index 5ea4cf9..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/grouped-group.blade.php"
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<x-filament-actions::group
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::dropdown.list.item"
+-    :group="$group"
+-    :icon="$getGroupedIcon()"
+-    class="fi-ac-grouped-group"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::group>
+diff --git "a/vendor\\filament\\actions\\resources\\views/icon-button-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/icon-button-action.blade.php"
+deleted file mode 100644
+index 8eeed06..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/icon-button-action.blade.php"
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<x-filament-actions::action
+-    :action="$action"
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::icon-button"
+-    :label="$getLabel()"
+-    :size="$getSize()"
+-    class="fi-ac-icon-btn-action"
+-/>
+diff --git "a/vendor\\filament\\actions\\resources\\views/icon-button-group.blade.php" "b/vendor\\filament\\actions\\resources\\views/icon-button-group.blade.php"
+deleted file mode 100644
+index b9bca1b..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/icon-button-group.blade.php"
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<x-filament-actions::group
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::icon-button"
+-    :group="$group"
+-    :label="$getLabel()"
+-    :size="$getSize()"
+-    class="fi-ac-icon-btn-group"
+-/>
+diff --git "a/vendor\\filament\\actions\\resources\\views/link-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/link-action.blade.php"
+deleted file mode 100644
+index 9efacb2..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/link-action.blade.php"
++++ /dev/null
+@@ -1,11 +0,0 @@
+-<x-filament-actions::action
+-    :action="$action"
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::link"
+-    :icon-position="$getIconPosition()"
+-    :size="$getSize()"
+-    class="fi-ac-link-action"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::action>
+diff --git "a/vendor\\filament\\actions\\resources\\views/link-group.blade.php" "b/vendor\\filament\\actions\\resources\\views/link-group.blade.php"
+deleted file mode 100644
+index 347dfc2..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/link-group.blade.php"
++++ /dev/null
+@@ -1,12 +0,0 @@
+-<x-filament-actions::group
+-    :badge="$getBadge()"
+-    :badge-color="$getBadgeColor()"
+-    dynamic-component="filament::link"
+-    :group="$group"
+-    :icon-position="$getIconPosition()"
+-    :size="$getSize()"
+-    tag="button"
+-    class="fi-ac-link-group"
+->
+-    {{ $getLabel() }}
+-</x-filament-actions::group>
+diff --git "a/vendor\\filament\\actions\\resources\\views/select-action.blade.php" "b/vendor\\filament\\actions\\resources\\views/select-action.blade.php"
+deleted file mode 100644
+index 89916f3..0000000
+--- "a/vendor\\filament\\actions\\resources\\views/select-action.blade.php"
++++ /dev/null
+@@ -1,28 +0,0 @@
+-@php
+-    $id = $getId();
+-    $isDisabled = $isDisabled();
+-@endphp
+-
+-<div class="fi-ac-select-action">
+-    <label for="{{ $id }}" class="sr-only">
+-        {{ $getLabel() }}
+-    </label>
+-
+-    <x-filament::input.wrapper :disabled="$isDisabled">
+-        <x-filament::input.select
+-            :disabled="$isDisabled"
+-            :id="$id"
+-            :wire:model.live="$getName()"
+-        >
+-            @if (($placeholder = $getPlaceholder()) !== null)
+-                <option value="">{{ $placeholder }}</option>
+-            @endif
+-
+-            @foreach ($getOptions() as $value => $label)
+-                <option value="{{ $value }}">
+-                    {{ $label }}
+-                </option>
+-            @endforeach
+-        </x-filament::input.select>
+-    </x-filament::input.wrapper>
+-</div>
