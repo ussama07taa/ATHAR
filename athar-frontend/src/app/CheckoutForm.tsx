@@ -241,7 +241,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
 
       {/* Customer info */}
       <div>
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', color: '#C8A25C', textTransform: 'uppercase', margin: '0 0 12px 0' }}>Vos coordonnées</p>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', color: '#C8A25C', textTransform: 'uppercase', margin: '0 0 12px 0' }}>Coordonnées de livraison</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {/* Nom */}
@@ -251,7 +251,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
               id="customer_name"
               className="athar-input"
               required
-              placeholder="Ahmed Taaouati"
+              placeholder="Votre nom complet"
               maxLength={100}
               value={form.customer_name}
               onChange={(e) => handleField('customer_name', e.target.value, sanitizeName)}
@@ -265,7 +265,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
               id="customer_phone"
               className="athar-input"
               required
-              placeholder="06 61 23 45 67"
+              placeholder="06 XX XX XX XX"
               type="tel"
               maxLength={20}
               value={form.customer_phone}
@@ -330,7 +330,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
               id="customer_address"
               className="athar-input"
               required
-              placeholder="Rue, numéro, immeuble..."
+              placeholder="N° et nom de rue, appartement, étage..."
               maxLength={256}
               value={form.customer_address}
               onChange={(e) => handleField('customer_address', e.target.value)}
@@ -354,7 +354,7 @@ export default function CheckoutForm({ cart, updateQty, onOrderSuccess }: Checko
           <span style={{ fontSize: '0.75rem', color: '#9B7A3D', fontWeight: 500 }}>Paiement à la livraison — aucune carte requise</span>
         </div>
         <button type="submit" className="btn-gold" disabled={status === 'loading'}>
-          {status === 'loading' ? 'Traitement...' : 'Commander maintenant'}
+          {status === 'loading' ? 'Traitement en cours...' : '💳 Paiement à la livraison'}
         </button>
       </div>
     </form>
