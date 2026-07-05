@@ -107,11 +107,11 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'order_number'      => 'ATH-' . strtoupper(Str::random(8)),
-                'customer_name'     => $validated['customer_name'],
-                'customer_phone'    => $validated['customer_phone'],
-                'customer_city'     => $validated['customer_city'],
-                'customer_address'  => $validated['customer_address'] ?? null,
-                'customer_quartier' => $validated['customer_quartier'],
+                'customer_name'     => strip_tags($validated['customer_name']),
+                'customer_phone'    => strip_tags($validated['customer_phone']),
+                'customer_city'     => strip_tags($validated['customer_city']),
+                'customer_address'  => isset($validated['customer_address']) ? strip_tags($validated['customer_address']) : null,
+                'customer_quartier' => strip_tags($validated['customer_quartier']),
                 'subtotal_amount'   => $subtotal,
                 'discount_amount'   => $discount,
                 'shipping_amount'   => $shipping['shipping_amount'],
