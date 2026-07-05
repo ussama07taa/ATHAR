@@ -130,19 +130,12 @@
         >
             <div
                 x-cloak
-                x-data="{ isShown: false }"
-                x-init="
-                    $nextTick(() => {
-                        isShown = isOpen
-                        $watch('isOpen', () => (isShown = isOpen))
-                    })
-                "
                 @if (filled($id))
                     x-on:keydown.window.escape="$dispatch('{{ $closeEventName }}', { id: '{{ $id }}' })"
                 @else
                     x-on:keydown.window.escape="close()"
                 @endif
-                x-show="isShown"
+                x-show="isOpen"
                 x-transition:enter="duration-300"
                 x-transition:leave="duration-300"
                 @if ($width === MaxWidth::Screen)
