@@ -110,7 +110,7 @@ class CheckoutController extends Controller
                 'customer_name'     => $validated['customer_name'],
                 'customer_phone'    => $validated['customer_phone'],
                 'customer_city'     => $validated['customer_city'],
-                'customer_address'  => $validated['customer_address'],
+                'customer_address'  => $validated['customer_address'] ?? null,
                 'customer_quartier' => $validated['customer_quartier'],
                 'subtotal_amount'   => $subtotal,
                 'discount_amount'   => $discount,
@@ -160,7 +160,7 @@ class CheckoutController extends Controller
         $validated = $request->validate([
             'customer_phone' => 'required|string|max:30',
             'customer_name'  => 'nullable|string|max:255',
-            'items'          => 'required|array',
+            'items'          => 'nullable|array',
         ]);
 
         // Clean phone number for consistency
