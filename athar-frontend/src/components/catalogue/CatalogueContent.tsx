@@ -94,11 +94,6 @@ export default function CatalogueContent({
     if (isArabic) params.set('is_arabic', '1');
     if (isDecant) params.set('is_decant', '1');
     
-    const genderParam = searchParams.get('gender');
-    if (genderParam && genderParam !== 'all') {
-      params.set('gender', genderParam);
-    }
-    
     const url = `/api/products?${params.toString()}`;
     
     fetch(url)

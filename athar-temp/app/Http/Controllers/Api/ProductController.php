@@ -59,7 +59,7 @@ class ProductController extends Controller
             }
 
             if ($request->filled('gender') && $request->gender !== 'all') {
-                $query->where('gender', $request->gender);
+                $query->whereIn('gender', [$request->gender, 'unisex']);
             }
 
             return $query->orderBy('name')->get();

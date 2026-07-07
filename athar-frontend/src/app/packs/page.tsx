@@ -27,6 +27,7 @@ export default async function PacksPage({ searchParams }: PageProps) {
   const params = new URLSearchParams();
   
   Object.entries(resolvedParams).forEach(([key, value]) => {
+    if (key === 'gender') return;
     if (typeof value === 'string') {
       params.append(key, value);
     } else if (Array.isArray(value)) {
