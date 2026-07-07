@@ -19,6 +19,13 @@ interface CatalogueContentProps {
   isDecant?: boolean;
 }
 
+function calcPriceRange(prods: Product[]) {
+  if (!prods.length) return { min: 0, max: 99999 };
+  const allPrices = prods.flatMap((p) => p.variants.map((v) => parseFloat(v.price))).filter(Boolean);
+  if (!allPrices.length) return { min: 0, max: 99999 };
+  return { min: Math.floor(Math.min(...allPrices)), max: Math.ceil(Math.max(...allPrices)) };
+}
+
 export default function CatalogueContent({ 
   initialProducts = [], 
   initialFilters = { brands: [], sizes: [] },
@@ -50,9 +57,10 @@ export default function CatalogueContent({
   const [selectedBrand, setSelectedBrand] = useState(brandFromUrl);
   const [selectedSize, setSelectedSize] = useState(sizeFromUrl);
   const [filterOptions, setFilterOptions] = useState<{ brands: string[]; sizes: string[] }>(initialFilters);
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(99999);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 99999 });
+  const initialPriceRange = calcPriceRange(initialProducts);
+  const [priceMin, setPriceMin] = useState(initialPriceRange.min);
+  const [priceMax, setPriceMax] = useState(initialPriceRange.max);
+  const [priceRange, setPriceRange] = useState(initialPriceRange);
 
   const prevCategoryRef = useRef(categorySlug);
 
