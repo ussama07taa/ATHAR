@@ -137,7 +137,7 @@ export default function BoxBuilder({ product }: BoxBuilderProps) {
           </div>
         ) : (
           <p style={{ color: '#666', fontSize: '1rem', marginTop: 12 }}>
-            Un pack exclusif pré-rempli par nos experts parfumeurs.
+            Un pack exclusif sélectionné et préparé par nos soins.
           </p>
         )}
       </div>

@@ -414,7 +414,7 @@ export default function StorefrontV2({ products, banners = [] }: { products: Pro
       {displayedProducts.length > 8 && (
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <a
-            href={`/catalogue${activeTab !== 'tout' ? `?category=${activeTab === 'homme' ? 'hommes' : 'femmes'}` : ''}`}
+            href={`/catalogue${activeTab !== 'tout' ? `?gender=${activeTab}` : ''}`}
             style={{
               display: 'inline-block',
               background: 'transparent',

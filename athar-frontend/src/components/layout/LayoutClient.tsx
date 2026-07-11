@@ -33,7 +33,7 @@ export default function LayoutClient({ children, initialMenuData }: { children: 
       <CartDrawer />
       <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} navLinks={navLinks} />
 
-      <div style={{ paddingTop: 130 }}>
+      <div style={{ paddingTop: 180 }}>
         {!isCatalogue && <Breadcrumbs />}
 
         <main style={{ minHeight: '100dvh' }}>{children}</main>

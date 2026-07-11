@@ -36,7 +36,7 @@ const faqs = [
     questions: [
       {
         q: 'Vos parfums sont-ils authentiques ?',
-        a: 'Absolument. Chaque fragrance Athar est une création originale issue de notre atelier à Tanger. Nous n\'utilisons que des essences de haute qualité.'
+        a: 'Absolument. Tous nos décants proviennent de flacons 100% authentiques, achetés directement auprès des marques officielles ou de distributeurs agréés. Nous procédons minutieusement à leur mise en flacon (décantage) de manière propre et stérile, sans aucune altération ni dilution du parfum d\'origine.'
       },
       {
         q: 'Puis-je commander des échantillons ?',

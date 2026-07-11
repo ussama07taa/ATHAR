@@ -275,7 +275,8 @@ export default function CatalogueContent({
               </button>
             </div>
 
-            {/* Center: Count — hidden on mobile to avoid overlap */}
+
+            {/* Center: Count */}
             <div style={{ 
               fontSize: '0.65rem',
               fontWeight: 600,
@@ -285,10 +286,9 @@ export default function CatalogueContent({
               display: 'flex',
               alignItems: 'center',
             }} className="desktop-only">
-              {filteredProducts.length} PRODUITS
+              {filteredProducts.length} {filteredProducts.length > 1 ? 'PRODUITS' : 'PRODUIT'}
             </div>
 
-            {/* Right: Sort */}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <select 
                 className="sort-select" 
